@@ -1,8 +1,8 @@
 -module(kvs).
 -description('KVS: Abstract Chain Storage').
--include_lib("kvs/include/api.hrl").
--include_lib("kvs/include/metainfo.hrl").
--include_lib("kvs/include/kvs.hrl").
+-include("api.hrl").
+-include("metainfo.hrl").
+-include("kvs.hrl").
 -export([info/3,warning/3,error/3,trace/3]).
 -export(?API).
 dba()              -> application:get_env(kvs,dba,store_mnesia).
