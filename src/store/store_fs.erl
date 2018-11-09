@@ -1,7 +1,7 @@
 -module(store_fs).
--include_lib("kvs/include/backend.hrl").
--include_lib("kvs/include/kvs.hrl").
--include_lib("kvs/include/metainfo.hrl").
+-include("backend.hrl").
+-include("kvs.hrl").
+-include("metainfo.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 -export(?BACKEND).
 start()    -> ok.
