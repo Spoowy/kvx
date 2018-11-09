@@ -28,27 +28,15 @@
 
 <h3>INTRO</h3>
 
-<p>The <b>kvs_stream</b> is intended to store, retrieve and manage doubly-linked lists
-   using simple key-value interface as underlying API.
-   The descriptor of the cursor consist mainly of two parts (reader and writer).
-   Writer holds the cached value of the top or bottom of the stream.
-   Reader holds the cached value of current cursor position.
-   Descriptor also tracks moving direction and distances to both ends,
-   which are updated during reader cursor repositioning.
-   Cursor should be stored in database.
-   If there is no cursor for some data then this data is not alive yet.
-   The data could be added only to list ends using writer cursor.
-   The data in list could be removed only by record id.
-   The list could not contain duplicates or even records with the same id.
-   When you consume the stream, the data is not deleted.
+<p>The STREAM module provides chain accumulation, storage, traversal and
    </p>
 
         <p><blockquote><p><ul>
-            <li><b><a href="#new">new/0</a></b> &mdash; new list.</li>
             <li><b><a href="#save">save/1</a></b> &mdash; store cursor to db.</li>
-            <li><b><a href="#load">load/1</a></b> &mdash; load cursor from db.</li>
-            <li><b><a href="#top">top/1</a></b> &mdash; top of the list.</li>
-            <li><b><a href="#bot">bot/1</a></b> &mdash; bottom of the list.</li>
+            <li><b><a href="#load">load_reader/1</a></b> &mdash; load reader cursor from db.</li>
+            <li><b><a href="#load">load_writer/1</a></b> &mdash; load writer cursor from db.</li>
+            <li><b><a href="#top">top/1</a></b> &mdash; top of the chain.</li>
+            <li><b><a href="#bot">bot/1</a></b> &mdash; bottom of the chain.</li>
             <li><b><a href="#up">up/1</a></b> &mdash; up from bottom (default).</li>
             <li><b><a href="#down">down/1</a></b> &mdash; down from top.</li>
             <li><b><a href="#next">next/1</a></b> &mdash; move reader next.</li>
@@ -56,68 +44,68 @@
             <li><b><a href="#take">take/1</a></b> &mdash; take N elements staring from reader.</li>
             <li><b><a href="#drop">drop/1</a></b> &mdash; skip N elements staring from reader.</li>
             <li><b><a href="#add">add/1</a></b> &mdash; add element to list.</li>
-            <li><b><a href="#remove">remove/1</a></b> &mdash; remove element from list.</li>
             <li><b><a href="#cons">cons/1</a></b> &mdash; add element to top.</li>
             <li><b><a href="#snoc">snoc/1</a></b> &mdash; add element to bot.</li>
         </ul></p></blockquote></p>
 
     <p>
       You can grab <a style="margin-bottom:30px;"
-       href="https://raw.githubusercontent.com/synrc/kvs/master/src/kvs_stream.erl">kvs_stream</a>
-      and use it in your applications without importing <b>synrc/kvs</b> dependency,
+       href="https://raw.githubusercontent.com/synrc/kvx/master/src/kvs_stream.erl">kvs_stream</a>
+      and use it in your applications without importing <b>synrc/kvx</b> dependency,
       as this module is self-containing.
       The possible applications are: public and private feeds, FIFO queues,
    unread messages, chat applications, blockchain, etc.<br><br>
-        <img src="https://n2o.space/img/Erlang.png" width=50></p>
+    </section>
+    <section>
+
+<h3>WRITER</h3>
+
+<p>Writer cursor represents append list chain with some cached values.
+   E.g., chain size, first element of the chain, cached value of
+   previous written message and field for passing arguments for stream functions, like add.</p>
+
+<figure><code>
+  -record(writer, { id    = [] :: term(),
+                    count =  0 :: integer(),
+                    cache = [] :: [] | tuple(),
+                    args  = [] :: term(),
+                    first = [] :: [] | tuple() } ).
+
+</code></figure>
+
+<p>For adding data to database you need first create writer cursor,
+   set the args field with record from metainfo and call save function.</p>
+
+<figure><code>
+
+</code></figure>
 
     </section>
     <section>
 
-<h3>RECORDS</h3>
+<h3>READER</h3>
 
-<figure><figcaption>KVS CORE</figcaption><code>
-    #ok { data= [] :: term() }.
-
- #error { data= [] :: term() }.
-
-   #cur { id=   [] :: term(),
-          top=  [] :: [] | integer(),
-          bot=  [] :: [] | integer(),
-          dir=   0 ::  0 | 1,
-          reader= [] :: [] | tuple(),
-          writer= [] :: [] | tuple(),
-          left=  0 :: integer(),
-          right= 0 :: inetegr(),
-          args= [] :: term(),
-          status=[]:: add | remove | save | load
-                    | next | prev | take | drop
-                    | top | bot }.
-
-  #iter { id=   [] :: [] | integer(),
-          prev= [] :: [] | integer(),
-          next= [] :: [] | integer()).
+<figure><figcaption>Reader Cursors</figcaption><code>
+  -record(reader, { id    = [] :: integer(),
+                    pos   =  0 :: [] | integer(),
+                    cache = [] :: [] | integer(),
+                    args  = [] :: term(),
+                    feed  = [] :: term(),
+                    dir   =  0 :: 0 | 1 } ).
 
 </code></figure>
 
-<p><ul>
-<li>id &mdash; Unique key of the cursor.</li>
-<li>writer &mdash; Append writes to one of the two ends of the list.</li>
-<li>reader &mdash; Reader cursor tracks distances to edges.</li>
-<li>dir=0 &mdash; Adding to top, reading up from bottom (default).</li>
-<li>dir=1 &mdash; Adding to bottom, reading down from top.</li>
-<li>top &mdash; The id of top element of the list.</li>
-<li>bot &mdash; The id of bottom element of the list.</li>
-<li>args &mdash; integer for take/drop/remove/get, tuple for add/put</li>
-<li>status &mdash; operation</li>
-<li>left &mdash; The distance to top from reader.</li>
-<li>right &mdash; The distance to bottom from reader.</li>
-</ul></p>
+    </section>
+    <section>
 
-<p><ul>
-<li>id &mdash; Unique key of the record in the list.</li>
-<li>next &mdash; The next element of the list.</li>
-<li>prev &mdash; The prev element of the list.</li>
-</ul></p>
+<h3>ITER</h3>
+
+<figure><figcaption>KVS CORE</figcaption><code>
+  -record(iter,   { id    = [] :: [] | integer(),
+                    next  = [] :: [] | integer(),
+                    prev  = [] :: [] | integer() } ).
+
+</code></figure>
 
     </section>
     <section>
@@ -392,7 +380,6 @@
     <section>
 
 <p>This module may refer to:
-<a href="http://erlang.org/doc/man/mnesia.html">mnesia</a></b>,
 <a href="kvs.htm"><b>kvs</b></a>.
 </p>
 
