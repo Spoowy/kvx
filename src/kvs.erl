@@ -20,7 +20,7 @@ info(T)            -> info    (T, #kvs{mod=dba()}).
 start()            -> start   (#kvs{mod=dba()}).
 stop()             -> stop    (#kvs{mod=dba()}).
 destroy()          -> destroy (#kvs{mod=dba()}).
-version()          -> version (#kvs{mod=dba()}).
+ver()              -> ver(#kvs{mod=dba()}).
 dir()              -> dir     (#kvs{mod=dba()}).
 seq(Table,DX)      -> seq     (Table, DX, #kvs{mod=dba()}).
 
@@ -42,7 +42,7 @@ change_storage(Type) -> [ change_storage(Name,Type) || #table{name=Name} <- kvs:
 change_storage(Table,Type,#kvs{mod=DBA}) -> DBA:change_storage(Table,Type).
 destroy(#kvs{mod=DBA}) -> DBA:destroy().
 join(Node,#kvs{mod=DBA}) -> DBA:join(Node).
-version(#kvs{mod=DBA}) -> DBA:version().
+ver(#kvs{mod=DBA}) -> DBA:version().
 tables() -> lists:flatten([ (M:metainfo())#schema.tables || M <- modules() ]).
 table(Name) when is_atom(Name) -> lists:keyfind(Name,#table.name,tables());
 table(_) -> false.
@@ -80,7 +80,7 @@ put(Records,#kvs{mod=Mod}) when is_list(Records) -> Mod:put(Records);
 put(Record,#kvs{mod=Mod}) -> Mod:put(Record).
 get(RecordName, Key, #kvs{mod=Mod}) -> Mod:get(RecordName, Key).
 delete(Tab, Key, #kvs{mod=Mod}) -> Mod:delete(Tab, Key).
-count(Tab,#kvs{mod=DBA}) -> lists:foldl(fun(T,A) -> DBA:count(T) + A end, 0, Tab).
+count(Tab,#kvs{mod=DBA}) -> DBA:count(Tab).
 index(Tab, Key, Value,#kvs{mod=DBA}) -> DBA:index(Tab, Key, Value).
 seq(Tab, Incr,#kvs{mod=DBA}) -> DBA:seq(case table(Tab) of #table{} -> atom_to_list(Tab); _ -> Tab end, Incr).
 notify(_EventPath, _Data) -> skip.
