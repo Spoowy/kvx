@@ -9,13 +9,12 @@ Features
 * Basic Schema for Storing Chains
 * Backends: MNESIA, FS
 * Extremely Compact: 420 LOC
+* Security: 
 
 Usage
 -----
 
-In rebar.config:
-
-```erlang
+```
 {kvs, ".*", {git, "git://github.com/synrc/kvx", []}}
 ```
 
@@ -23,5 +22,7 @@ Credits
 -------
 
 * Maxim Sokhatsky
-
-OM A HUM
+* Vlad Ki
+* Andrii Zadorozhnii
+* Yuri Maslovsky
+* Igor Kharin
