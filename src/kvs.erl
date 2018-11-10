@@ -1,10 +1,16 @@
 -module(kvs).
 -description('KVS: Abstract Chain Storage').
+-include_lib("stdlib/include/assert.hrl").
 -include("api.hrl").
 -include("metainfo.hrl").
+-include("stream.hrl").
 -include("kvs.hrl").
--export([info/3,warning/3,error/3,trace/3]).
+-export([info/3,warning/3,error/3,trace/3,dump/0,check/0]).
 -export(?API).
+-export(?STREAM).
+
+% kvs api
+
 dba()              -> application:get_env(kvs,dba,store_mnesia).
 all(Table)         -> all     (Table, #kvs{mod=dba()}).
 delete(Table,Key)  -> delete  (Table, Key, #kvs{mod=dba()}).
@@ -23,6 +29,23 @@ destroy()          -> destroy (#kvs{mod=dba()}).
 ver()              -> ver(#kvs{mod=dba()}).
 dir()              -> dir     (#kvs{mod=dba()}).
 seq(Table,DX)      -> seq     (Table, DX, #kvs{mod=dba()}).
+
+% stream api
+
+top  (X) -> kvs_stream:top (X).
+bot  (X) -> kvs_stream:bot (X).
+next (X) -> kvs_stream:next(X).
+prev (X) -> kvs_stream:prev(X).
+drop (X) -> kvs_stream:drop(X).
+take (X) -> kvs_stream:take(X).
+save (X) -> kvs_stream:save(X).
+up   (X) -> kvs_stream:up  (X).
+down (X) -> kvs_stream:down(X).
+add  (X) -> kvs_stream:add (X).
+load_writer (X) -> kvs_stream:load_writer(X).
+load_reader (X) -> kvs_stream:load_reader(X).
+writer      (X) -> kvs_stream:writer(X).
+reader      (X) -> kvs_stream:reader(X).
 
 metainfo() ->  #schema { name = kvs , tables = core() }.
 core()    -> [ #table { name = id_seq , fields = record_info(fields,id_seq) , keys=[thing]} ].
@@ -128,3 +151,20 @@ info   (Module, String, Args) -> log(Module,  String, Args, info).
 trace  (Module, String, Args) -> log(Module,  String, Args, trace).
 warning(Module, String, Args) -> log(Module,  String, Args, warning).
 error  (Module, String, Args) -> log(Module,  String, Args, error).
+
+% tests
+
+check() ->
+    Id  = {emails,1},
+    X   = 5,
+    _W   = kvs:save(kvs:writer(Id)),
+    #reader{id=R1} = kvs:save(kvs:reader(Id)),
+    #reader{id=R2} = kvs:save(kvs:reader(Id)),
+    [ kvs:save(kvs:add((kvs:load_writer(Id))
+      #writer{args=#emails{}})) || _ <- lists:seq(1,X) ],
+    Bot = kvs:bot(kvs:load_reader(R1)),
+    Top = kvs:top(kvs:load_reader(R2)),
+    #reader{args=F} = kvs:take(Bot#reader{args=20,dir=0}),
+    #reader{args=B} = kvs:take(Top#reader{args=20,dir=1}),
+    ?assertMatch(X,length(F)),
+    ?assertMatch(F,lists:reverse(B)).

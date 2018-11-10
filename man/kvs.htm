@@ -46,13 +46,27 @@
  <p>You can change backend by setting application env.
     This behaves well even under the heavy load.</p>
 
+    </section>
+    <section>
+
+<h3>SETUP</h3>
+
+<p>In sys.config you should specify kvs backend and list of modules
+   containing <b>metainfo/0</b> exported function.</p>
+
 <figure><code>
- application:set_env(kvs,dba,store_mnesia).
+  [{kvs, [{dba,store_mnesia},
+          {schema,[kvs,kvs_stream]}]}].
 
 </code></figure>
 
 <h4>dir() -> list({'table',atom()}).</h4>
+
+<p>Returns actual tables.</p>
+
 <h4>ver() -> {'version',string()}.</h4>
+
+<p>Returns KVX version.</p>
 
     </section>
     <section>
@@ -73,7 +87,36 @@
 </code></figure>
 
 <h4>seq(atom(), integer()) -> integer().</h4>
+
+<p>Increments and returns id counter for the particular table.</p>
+
 <h4>count(atom()) -> integer().</h4>
+
+<p>Returns number of records in table.</p>
+
+    </section>
+    <section>
+
+<h3>DATA</h3>
+
+<p>Data operations.
+   </p>
+
+<h4>put(tuple()) -> ok | {error,any()}.</h4>
+
+<p>Storing of data record.</p>
+
+<h4>get(atom(),any()) -> {ok,any()} | {error,duplicated} | {error,not_found}.</h4>
+
+<p>Retrival of data record.</p>
+
+<h4>delete(atom(),any()) -> ok | {error,any()}.</h4>
+
+<p>Deletion of data record.</p>
+
+<h4>index(atom(),any(), Value :: any()) -> list(tuple()).</h4>
+
+<p>Search of data record by an indexed field and a given value.</p>
 
     </section>
     <section>
@@ -86,7 +129,7 @@
 </main>
 
 <footer>
-    2005&mdash;2017 &copy; Synrc Research Center
+    2005&mdash;2018 &copy; Synrc Research Center
 </footer>
 
 </body>

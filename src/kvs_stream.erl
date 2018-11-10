@@ -3,7 +3,6 @@
 -include("kvs.hrl").
 -include("stream.hrl").
 -include("metainfo.hrl").
--include_lib("stdlib/include/assert.hrl").
 -export(?STREAM).
 
 metainfo() -> #schema { name = kvs,    tables = tables() }.
@@ -100,22 +99,3 @@ add(M,#writer{cache=[]}=C) ->
 add(M,#writer{cache=V,count=S}=C) ->
     N=sp(sn(M,[]),id(V)), P=sn(V,id(M)), kvs:put([N,P]),
     C#writer{cache=N,count=S+1}.
-
-% tests
-
-check() ->
-    Id  = {p2p,1,2},
-    X   = 5,
-    _W   = kvs_stream:save(kvs_stream:writer(Id)),
-    #reader{id=R1} = kvs_stream:save(kvs_stream:reader(Id)),
-    #reader{id=R2} = kvs_stream:save(kvs_stream:reader(Id)),
-    [ kvs_stream:save(
-      kvs_stream:add((
-      kvs_stream:load_writer(Id))
-      #writer{args={emails,[],[],[],[]}})) || _ <- lists:seq(1,X) ],
-    Bot = kvs_stream:bot(kvs_stream:load_reader(R1)),
-    Top = kvs_stream:top(kvs_stream:load_reader(R2)),
-    #reader{args=F} = kvs_stream:take(Bot#reader{args=20,dir=0}),
-    #reader{args=B} = kvs_stream:take(Top#reader{args=20,dir=1}),
-    ?assertMatch(X,length(F)),
-    ?assertMatch(F,lists:reverse(B)).

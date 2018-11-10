@@ -63,7 +63,6 @@ just_one(Fun) ->
         Error -> Error end.
 
 add(Record) -> mnesia:activity(context(),fun() -> kvs:append(Record,#kvs{mod=?MODULE}) end).
-remove(Record,Id) -> mnesia:activity(context(),fun() -> kvs:takeoff(Record,Id,#kvs{mod=?MODULE}) end).
 context() -> application:get_env(kvs,mnesia_context,async_dirty).
 
 sync_indexes() ->
