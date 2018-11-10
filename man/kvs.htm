@@ -66,7 +66,26 @@
 
 <h4>ver() -> {'version',string()}.</h4>
 
-<p>Returns KVX version.</p>
+<p>Returns backend version.</p>
+
+<h4>dump() -> ok.</h4>
+
+<p>Display database information.</p>
+
+<figure><code>
+ > kvs:dump().
+                NAME                     STORAGE TYPE    MEMORY (MB)   ELEMENTS
+
+              id_seq                      disc_copies           0.00          0
+              writer                      disc_copies           0.00          0
+              emails                      disc_copies           0.00          0
+              reader                      disc_copies           0.00          0
+
+ Snapshot taken: {{2018,11,10},{5,2,38}}
+ ok
+
+</code></figure>
+
 
     </section>
     <section>

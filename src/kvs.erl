@@ -109,7 +109,7 @@ index(Tab, Key, Value,#kvs{mod=DBA}) -> DBA:index(Tab, Key, Value).
 seq(Tab, Incr,#kvs{mod=DBA}) -> DBA:seq(case table(Tab) of #table{} -> atom_to_list(Tab); _ -> Tab end, Incr).
 notify(_EventPath, _Data) -> skip.
 
-dump() -> dump([ N || #table{name=N} <- kvs:tables() ]).
+dump() -> dump([ N || #table{name=N} <- kvs:tables() ]), ok.
 dump(short) ->
     Gen = fun(T) ->
         {S,M,C}=lists:unzip3([ dump_info(R) || R <- T ]),
