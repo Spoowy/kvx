@@ -9,13 +9,15 @@ Features
 * Basic Schema for Storing Chains
 * Backends: MNESIA, FS
 * Extremely Compact: 420 LOC
-* Security: 
 
 Usage
 -----
 
 ```
-{kvs, ".*", {git, "git://github.com/synrc/kvx", []}}
+$ git clone https://github.com/synrc/kvx && cd kvx
+$ open man/kvs.htm
+$ mad com pla rep
+> kvs:join().
 ```
 
 Credits
