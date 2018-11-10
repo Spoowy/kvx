@@ -4,6 +4,7 @@
 -include("stream.hrl").
 -include("metainfo.hrl").
 -export(?STREAM).
+-export([metainfo/0]).
 
 metainfo() -> #schema { name = kvs,    tables = tables() }.
 tables() -> [ #table  { name = writer, fields = record_info(fields, writer) },

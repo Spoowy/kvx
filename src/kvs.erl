@@ -8,6 +8,7 @@
 -export([info/3,warning/3,error/3,trace/3,dump/0,check/0]).
 -export(?API).
 -export(?STREAM).
+-export([metainfo/0]).
 
 % kvs api
 
