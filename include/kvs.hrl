@@ -17,9 +17,9 @@
                   next  = [] :: [] | integer(),
                   prev  = [] :: [] | integer() } ).
 -record(emails, { id    = [] :: [] | integer(),
-                  email = [] :: [] | binary(),
                   next  = [] :: [] | integer(),
-                  prev  = [] :: [] | integer() } ).
+                  prev  = [] :: [] | integer(),
+                  email = [] :: [] | binary() }).
 -record(kvs,    { mod   = store_mnesia :: store_mnesia | store_redis | store_fs,
                   cx    = [] :: term() }).
 -endif.
