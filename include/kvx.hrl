@@ -1,5 +1,5 @@
--ifndef(KVS_HRL).
--define(KVS_HRL, true).
+-ifndef(KVX_HRL).
+-define(KVX_HRL, true).
 -record(id_seq, { thing = [] :: term(),
                   id    =  0 :: integer() } ).
 -record(writer, { id    = [] :: term(),
@@ -20,6 +20,6 @@
                   next  = [] :: [] | integer(),
                   prev  = [] :: [] | integer(),
                   email = [] :: [] | binary() }).
--record(kvs,    { mod   = store_mnesia :: store_mnesia | store_redis | store_fs,
+-record(kvx,    { mod   = store_mnesia :: store_mnesia | store_redis | store_fs,
                   cx    = [] :: term() }).
 -endif.

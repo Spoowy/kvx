@@ -1,22 +1,22 @@
 -module(store_fs).
 -include("backend.hrl").
--include("kvs.hrl").
+-include("kvx.hrl").
 -include("metainfo.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 -export(?BACKEND).
 start()    -> ok.
 stop()     -> ok.
 destroy()  -> ok.
-version()  -> {version,"KVS FS"}.
+version()  -> {version,"kvx FS"}.
 dir()      -> [ {table,F} || F <- filelib:wildcard("data/*"), filelib:is_dir(F) ].
 join(_Node) -> filelib:ensure_dir("data/"). % should be rsync or smth
 change_storage(_Table,_Type) -> ok.
 
 initialize() ->
-    kvs:info(?MODULE,"fs init.~n",[]),
+    kvx:info(?MODULE,"fs init.~n",[]),
     mnesia:create_schema([node()]),
-    [ kvs:init(store_fs,Module) || Module <- kvs:modules() ],
-    mnesia:wait_for_tables([ T#table.name || T <- kvs:tables()],infinity).
+    [ kvx:init(store_fs,Module) || Module <- kvx:modules() ],
+    mnesia:wait_for_tables([ T#table.name || T <- kvx:tables()],infinity).
 
 index(_Tab,_Key,_Value) -> ok.
 get(TableName, Key) ->

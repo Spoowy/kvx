@@ -1,14 +1,14 @@
 -module(store_mnesia).
 -include("backend.hrl").
--include("kvs.hrl").
+-include("kvx.hrl").
 -include("metainfo.hrl").
 -include_lib("mnesia/src/mnesia.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 -export(?BACKEND).
 start()    -> mnesia:start().
 stop()     -> mnesia:stop().
-destroy()  -> [mnesia:delete_table(T)||{_,T}<-kvs:dir()], mnesia:delete_schema([node()]), ok.
-version()  -> {version,"KVS MNESIA"}.
+destroy()  -> [mnesia:delete_table(T)||{_,T}<-kvx:dir()], mnesia:delete_schema([node()]), ok.
+version()  -> {version,"kvx MNESIA"}.
 dir()      -> [{table,T}||T<-mnesia:system_info(local_tables)].
 join([])   -> mnesia:change_table_copy_type(schema, node(), disc_copies), initialize();
 join(Node) ->
@@ -21,14 +21,14 @@ join(Node) ->
 change_storage(Table,Type) -> mnesia:change_table_copy_type(Table, node(), Type).
 
 initialize() ->
-    kvs:info(?MODULE,"mnesia init.~n",[]),
+    kvx:info(?MODULE,"mnesia init.~n",[]),
     mnesia:create_schema([node()]),
-    Res = [ kvs:init(store_mnesia,Module) || Module <- kvs:modules() ],
-    mnesia:wait_for_tables([ T#table.name || T <- kvs:tables()],infinity),
+    Res = [ kvx:init(store_mnesia,Module) || Module <- kvx:modules() ],
+    mnesia:wait_for_tables([ T#table.name || T <- kvx:tables()],infinity),
     Res.
 
 index(Tab,Key,Value) ->
-    Table = kvs:table(Tab),
+    Table = kvx:table(Tab),
     Index = string:str(Table#table.fields,[Key]),
     lists:flatten(many(fun() -> mnesia:index_read(Tab,Value,Index+1) end)).
 
@@ -48,7 +48,7 @@ void(Fun) -> case mnesia:activity(context(),Fun) of {atomic, ok} -> ok; {aborted
 info(T) -> try mnesia:table_info(T,all) catch _:_ -> [] end.
 create_table(Name,Options) ->
     X = mnesia:create_table(Name, Options),
-    kvs:info(?MODULE,"Create table ~p ~nOptions ~p~nReturn ~p~n",[Name, Options,X]),
+    kvx:info(?MODULE,"Create table ~p ~nOptions ~p~nReturn ~p~n",[Name, Options,X]),
     X.
 add_table_index(Record, Field) -> mnesia:add_table_index(Record, Field).
 exec(Q) -> F = fun() -> qlc:e(Q) end, {atomic, Val} = mnesia:activity(context(),F), Val.
@@ -62,11 +62,11 @@ just_one(Fun) ->
         [_|_] -> {error, duplicated};
         Error -> Error end.
 
-add(Record) -> mnesia:activity(context(),fun() -> kvs:append(Record,#kvs{mod=?MODULE}) end).
-context() -> application:get_env(kvs,mnesia_context,async_dirty).
+add(Record) -> mnesia:activity(context(),fun() -> kvx:append(Record,#kvx{mod=?MODULE}) end).
+context() -> application:get_env(kvx,mnesia_context,async_dirty).
 
 sync_indexes() ->
-    lists:map(fun sync_indexes/1, kvs:tables()).
+    lists:map(fun sync_indexes/1, kvx:tables()).
 sync_indexes(#table{name = Table, keys = Keys}) ->
     mnesia:wait_for_tables(Table, 10000),
     #cstruct{attributes = Attrs} = mnesia:table_info(Table, cstruct),

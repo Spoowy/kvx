@@ -1,5 +1,5 @@
 -ifndef(STREAM_HRL).
--include("kvs.hrl").
+-include("kvx.hrl").
 -define(STREAM_HRL, true).
 -define(STREAM, [top/1, bot/1, next/1, prev/1, drop/1, take/1,
                  load_writer/1, load_reader/1, writer/1, reader/1,

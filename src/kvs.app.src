@@ -1,7 +1,0 @@
-{application, kvs,
-   [{description, "KVS Abstract Chain Storage"},
-    {vsn, "5.11"},
-    {registered, []},
-    {applications, [kernel,stdlib,mnesia]},
-    {mod, { kvs_sup, []}},
-    {env, []} ]}.
