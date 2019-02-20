@@ -1,1 +1,1 @@
-[kernel,stdlib,mnesia,rocksdb,kvs,kvx]
+[kernel,stdlib,mnesia,kvx]

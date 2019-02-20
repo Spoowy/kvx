@@ -45,7 +45,7 @@
 
     <p>
       You can grab <a style="margin-bottom:30px;"
-       href="https://raw.githubusercontent.com/synrc/kvx/master/src/kvs_stream.erl">kvs_stream</a>
+       href="https://raw.githubusercontent.com/synrc/kvx/master/src/kvx_stream.erl">kvx_stream</a>
       and use it in your applications without importing <b>synrc/kvx</b> dependency,
       as this module is self-containing.
       The possible applications are: public and private feeds, FIFO queues,
@@ -56,30 +56,30 @@
 <h3>SESSION</h3>
 
 <figure><code>
- > kvs:join().
+ > kvx:join().
  [[{table,id_seq,false,set,[thing,id],[thing],disc_copies}],
   [{table,writer,false,set,[id,count,cache,args,first],[],disc_copies},
    {table,emails,false,set,[id,email,next,prev],[],disc_copies},
    {table,reader,false,set,[id,pos,cache,args,feed,dir],[],disc_copies}]]
 
- > kvs:check().
+ > kvx:check().
  ok
 
- > kvs:all(reader).
+ > kvx:all(reader).
  [{reader,1,0,[],[],{emails,1},0},
   {reader,2,0,[],[],{emails,1},0}]
 
- > rr(kvs).
- [emails,id_seq,iter,kvs,reader,schema,table,writer]
+ > rr(kvx).
+ [emails,id_seq,iter,kvx,reader,schema,table,writer]
 
- > kvs:save(kvs:reader({emails,1})).
+ > kvx:save(kvx:reader({emails,1})).
  #reader{id = 3,pos = 0,
          cache = {emails,1},
          args = [],
          feed = {emails,1},
          dir = 0}
 
- > kvs:take(kvs:bot((kvs:load_reader(3))#reader{args=-1})).
+ > kvx:take(kvx:bot((kvx:load_reader(3))#reader{args=-1})).
  #reader{id = 3,pos = 5,
          cache = {emails,5},
          args = [#emails{id = 5,email = [],next = 4,prev = []},
@@ -168,7 +168,7 @@
 
 <h3>ITER</h3>
 
-<figure><figcaption>KVS Stream Iterator</figcaption><code>
+<figure><figcaption>KVX Stream Iterator</figcaption><code>
   -record(iter,   { id    = [] :: [] | integer(),
                     next  = [] :: [] | integer(),
                     prev  = [] :: [] | integer() } ).
@@ -198,7 +198,7 @@
     <section>
 
 <p>This module may refer to:
-<a href="kvs.htm"><b>kvs</b></a>.
+<a href="kvx.htm"><b>kvx</b></a>.
 </p>
 
     </section>

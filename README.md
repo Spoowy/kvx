@@ -15,9 +15,9 @@ Usage
 
 ```
 $ git clone https://github.com/synrc/kvx && cd kvx
-$ open man/kvs.htm
+$ open man/kvx.htm
 $ mad com pla rep
-> kvs:join().
+> kvx:join().
 ```
 
 Credits
