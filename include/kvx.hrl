@@ -20,6 +20,6 @@
                   next  = [] :: [] | integer(),
                   prev  = [] :: [] | integer(),
                   email = [] :: [] | binary() }).
--record(kvx,    { mod   = store_mnesia :: store_mnesia | store_redis | store_fs,
+-record(kvx,    { mod   = kvx_mnesia :: kvx_mnesia | kvx_redis | kvx_fs,
                   cx    = [] :: term() }).
 -endif.
