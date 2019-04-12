@@ -20,7 +20,7 @@ get(Tab, Key) ->
     Address = <<(list_to_binary(lists:concat(["/",Tab,"/"])))/binary,(term_to_binary(Key))/binary>>,
     case rocksdb:get(ref(), Address, []) of
          not_found -> {error,not_found};
-         {ok,Bin} -> binary_to_term(Bin,[safe]) end.
+         {ok,Bin} -> {ok,binary_to_term(Bin,[safe])} end.
 
 put(Records) when is_list(Records) -> lists:map(fun(Record) -> put(Record) end, Records);
 put(Record) -> rocksdb:put(ref(), <<(list_to_binary(lists:concat(["/",element(1,Record),"/"])))/binary,
@@ -41,6 +41,6 @@ next(I,Key,S,A,X,T) ->
                        [binary_to_term(X,[safe])|T]);
                   _ -> T end.
 
-seq(RecordName, Incr) -> [].
+seq(R, I) -> kvx_mnesia:seq(R, I).
 create_table(_,_) -> [].
 add_table_index(_, _) -> ok.

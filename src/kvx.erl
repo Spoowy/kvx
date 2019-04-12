@@ -158,7 +158,7 @@ error  (Module, String, Args) -> log(Module,  String, Args, error).
 % tests
 
 check() ->
-    Id  = {emails1},
+    Id  = {list},
     X   = 5,
     _W   = kvx:save(kvx:writer(Id)),
     #reader{id=R1} = kvx:save(kvx:reader(Id)),
