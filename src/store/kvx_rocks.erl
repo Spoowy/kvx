@@ -17,14 +17,14 @@ initialize() -> [ kvx:init(kvx_rocks,Module) || Module <- kvx:modules() ].
 ref() -> application:get_env(kvx,rocks_ref,[]).
 index(_,_,_) -> ok.
 get(Tab, Key) ->
-    Address = list_to_binary(lists:concat(["/",Tab,"/",Key])),
+    Address = <<(list_to_binary(lists:concat(["/",Tab,"/"])))/binary,(term_to_binary(Key))/binary>>,
     case rocksdb:get(ref(), Address, []) of
          not_found -> {error,not_found};
          {ok,Bin} -> binary_to_term(Bin,[safe]) end.
 
 put(Records) when is_list(Records) -> lists:map(fun(Record) -> put(Record) end, Records);
-put(Record) -> rocksdb:put(ref(), list_to_binary(lists:concat(["/",element(1,Record),"/",
-                                  element(2,Record)])), term_to_binary(Record), [{sync,true}]).
+put(Record) -> rocksdb:put(ref(), <<(list_to_binary(lists:concat(["/",element(1,Record),"/"])))/binary,
+                                    (term_to_binary(element(2,Record)))/binary>>, term_to_binary(Record), [{sync,true}]).
 
 delete(_Tab, _Key) -> ok.
 count(RecordName) -> {ok,I} = rocksdb:iterator(ref(), []), [].
