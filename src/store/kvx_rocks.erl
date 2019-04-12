@@ -29,11 +29,18 @@ put(Record) -> rocksdb:put(ref(), list_to_binary(lists:concat(["/",element(1,Rec
 delete(_Tab, _Key) -> ok.
 count(RecordName) -> {ok,I} = rocksdb:iterator(ref(), []), [].
 all(R) -> {ok,I} = rocksdb:iterator(ref(), []),
-           First = rocksdb:iterator_move(I, {seek,list_to_binary(lists:concat(["/",R,"/"]))}),
-           next(I,First,[]).
+           Key = list_to_binary(lists:concat(["/",R])),
+           First = rocksdb:iterator_move(I, {seek,Key}),
+           lists:reverse(next(I,Key,size(Key),First,[],[])).
 
-next(I,{ok,_,X},T) -> next(I,rocksdb:iterator_move(I, next), [binary_to_term(X,[safe])|T]);
-next(I,_,T) -> T.
+next(I,Key,S,{ok,A,X},_,T) -> next(I,Key,S,A,X,T);
+next(I,Key,S,{error,_},_,T) -> T;
+next(I,Key,S,A,X,T) ->
+     case binary:part(A,0,S) of Key ->
+          next(I,Key,S,rocksdb:iterator_move(I, next), [],
+                       [binary_to_term(X,[safe])|T]);
+                  _ -> T end.
+
 seq(RecordName, Incr) -> [].
 create_table(_,_) -> [].
 add_table_index(_, _) -> ok.
