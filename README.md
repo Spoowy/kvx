@@ -1,5 +1,5 @@
-KVX: Abstract Chain Storage
-===========================
+KVX: Abstract Chain Database
+============================
 [![Build Status](https://travis-ci.org/synrc/kvx.svg?branch=master)](https://travis-ci.org/synrc/kvx)
 
 Features
