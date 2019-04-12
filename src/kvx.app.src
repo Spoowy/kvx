@@ -1,6 +1,6 @@
 {application, kvx,
    [{description, "KVX Abstract Chain Storage"},
-    {vsn, "5.11"},
+    {vsn, "6.4"},
     {registered, []},
     {applications, [kernel,stdlib,mnesia]},
     {mod, { kvx_sup, []}},
