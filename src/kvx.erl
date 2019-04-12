@@ -20,6 +20,7 @@ index(Table,K,V)   -> index   (Table, K,V, #kvx{mod=dba()}).
 change_storage(Table,Type) -> change_storage(Table,Type, #kvx{mod=dba()}).
 join()             -> join    ([],    #kvx{mod=dba()}).
 join(Node)         -> join    (Node,  #kvx{mod=dba()}).
+leave()            -> leave   (#kvx{mod=dba()}).
 count(Table)       -> count   (Table, #kvx{mod=dba()}).
 put(Record)        -> ?MODULE:put     (Record, #kvx{mod=dba()}).
 fold(Fun,Acc,T,S,C,D) -> fold (Fun,Acc,T,S,C,D, #kvx{mod=dba()}).
@@ -66,6 +67,7 @@ change_storage(Type) -> [ change_storage(Name,Type) || #table{name=Name} <- kvx:
 change_storage(Table,Type,#kvx{mod=DBA}) -> DBA:change_storage(Table,Type).
 destroy(#kvx{mod=DBA}) -> DBA:destroy().
 join(Node,#kvx{mod=DBA}) -> DBA:join(Node).
+leave(#kvx{mod=DBA}) -> DBA:leave().
 ver(#kvx{mod=DBA}) -> DBA:version().
 tables() -> lists:flatten([ (M:metainfo())#schema.tables || M <- modules() ]).
 table(Name) when is_atom(Name) -> lists:keyfind(Name,#table.name,tables());

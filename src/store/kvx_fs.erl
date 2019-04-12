@@ -7,7 +7,7 @@
 start()    -> ok.
 stop()     -> ok.
 destroy()  -> ok.
-version()  -> {version,"kvx FS"}.
+version()  -> {version,"KVX FS"}.
 dir()      -> [ {table,F} || F <- filelib:wildcard("data/*"), filelib:is_dir(F) ].
 join(_Node) -> filelib:ensure_dir("data/"). % should be rsync or smth
 change_storage(_Table,_Type) -> ok.

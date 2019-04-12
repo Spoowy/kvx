@@ -8,7 +8,7 @@
 start()    -> mnesia:start().
 stop()     -> mnesia:stop().
 destroy()  -> [mnesia:delete_table(T)||{_,T}<-kvx:dir()], mnesia:delete_schema([node()]), ok.
-version()  -> {version,"kvx MNESIA"}.
+version()  -> {version,"KVX MNESIA"}.
 dir()      -> [{table,T}||T<-mnesia:system_info(local_tables)].
 join([])   -> mnesia:change_table_copy_type(schema, node(), disc_copies), initialize();
 join(Node) ->

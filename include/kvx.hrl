@@ -13,6 +13,7 @@
                   args  = [] :: term(),
                   feed  = [] :: term(),
                   dir   =  0 :: 0 | 1 } ).
+-record(it,     { id    = [] :: [] | integer() } ).
 -record(iter,   { id    = [] :: [] | integer(),
                   next  = [] :: [] | integer(),
                   prev  = [] :: [] | integer() } ).
