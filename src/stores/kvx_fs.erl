@@ -83,3 +83,5 @@ hex_octet(N) -> [N - 10 + $a].
 escape_byte(C) -> normalize(hex_octet(C)).
 normalize(H) when length(H) == 1 -> "%0" ++ H;
 normalize(H) -> "%" ++ H.
+
+dump() -> ok.

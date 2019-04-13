@@ -5,6 +5,7 @@
 -spec put(Record :: tuple()) -> ok | {error,any()}.
 -spec get(Tab :: atom(), Key :: any()) -> {ok,any()} | {error,not_found | duplicated}.
 -spec delete(Tab :: atom(), Key :: any()) -> ok | {error,any()}.
+-spec dump() -> ok.
 -spec index(Tab :: atom(), Key :: any(), Value :: any()) -> list(tuple()).
 -compile({no_auto_import,[get/1,put/2]}).
 -endif.

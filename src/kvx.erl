@@ -19,6 +19,7 @@ get(Table,Key)     -> ?MODULE:get     (Table, Key, #kvx{mod=dba()}).
 index(Table,K,V)   -> index   (Table, K,V, #kvx{mod=dba()}).
 change_storage(Table,Type) -> change_storage(Table,Type, #kvx{mod=dba()}).
 join()             -> join    ([],    #kvx{mod=dba()}).
+dump()             -> dump    (#kvx{mod=dba()}).
 join(Node)         -> join    (Node,  #kvx{mod=dba()}).
 leave()            -> leave   (#kvx{mod=dba()}).
 count(Table)       -> count   (Table, #kvx{mod=dba()}).
@@ -111,24 +112,7 @@ index(Tab, Key, Value,#kvx{mod=DBA}) -> DBA:index(Tab, Key, Value).
 seq(Tab, Incr,#kvx{mod=DBA}) -> DBA:seq(case table(Tab) of #table{} -> atom_to_list(Tab); _ -> Tab end, Incr).
 notify(_EventPath, _Data) -> skip.
 
-dump() -> dump([ N || #table{name=N} <- kvx:tables() ]), ok.
-dump(short) ->
-    Gen = fun(T) ->
-        {S,M,C}=lists:unzip3([ dump_info(R) || R <- T ]),
-        {lists:usort(S),lists:sum(M),lists:sum(C)}
-    end,
-    dump_format([ {T,Gen(T)} || T <- [ N || #table{name=N} <- kvx:tables() ] ]);
-dump(Table) when is_atom(Table) -> dump(Table);
-dump(Tables) ->
-    dump_format([{T,dump_info(T)} || T <- lists:flatten(Tables) ]).
-dump_info(T) ->
-    {mnesia:table_info(T,storage_type),
-    mnesia:table_info(T,memory) * erlang:system_info(wordsize) / 1024 / 1024,
-    mnesia:table_info(T,size)}.
-dump_format(List) ->
-    io:format("~20s ~32s ~14s ~10s~n~n",["NAME","STORAGE TYPE","MEMORY (MB)","ELEMENTS"]),
-    [ io:format("~20s ~32w ~14.2f ~10b~n",[T,S,M,C]) || {T,{S,M,C}} <- List ],
-    io:format("~nSnapshot taken: ~p~n",[calendar:now_to_datetime(os:timestamp())]).
+dump(#kvx{mod=Mod}) -> Mod:dump().
 
 logger()       -> application:get_env(?MODULE,logger,n2o_io).
 log_modules()  -> application:get_env(?MODULE,log_modules,[]).

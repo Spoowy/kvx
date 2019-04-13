@@ -65,37 +65,43 @@
 
 <figure><code>
  > kvx:join().
- [[{table,id_seq,false,set,[thing,id],[thing],disc_copies}],
-  [{table,writer,false,set,[id,count,cache,args,first],[],disc_copies},
-   {table,emails,false,set,[id,email,next,prev],[],disc_copies},
-   {table,reader,false,set,[id,pos,cache,args,feed,dir],[],disc_copies}]]
+ ok
 
  > kvx:check().
  ok
 
  > kvx:all(reader).
- [{reader,1,0,[],[],{emails,1},0},
-  {reader,2,0,[],[],{emails,1},0}]
+ [{reader,1555175169121817000,0,[],[],
+          {list,1555175169120161000},
+          0},
+  {reader,1555175169121249000,0,[],[],
+          {list,1555175169120161000},
+          0}]
 
  > rr(kvx).
  [emails,id_seq,iter,kvx,reader,schema,table,writer]
 
- > kvx:save(kvx:reader({emails,1})).
- #reader{id = 3,pos = 0,
-         cache = {emails,1},
+ > kvx:save(kvx:reader({list,1555175169120161000})).
+ #reader{id = 1555175244188986000,pos = 0,
+         cache = {emails,1555175169122304000},
          args = [],
-         feed = {emails,1},
+         feed = {list,1555175169120161000},
          dir = 0}
 
- > kvx:take(kvx:bot((kvx:load_reader(3))#reader{args=-1})).
- #reader{id = 3,pos = 5,
-         cache = {emails,5},
-         args = [#emails{id = 5,email = [],next = 4,prev = []},
-                 #emails{id = 4,email = 5,next = 3,prev = []},
-                 #emails{id = 3,email = 4,next = 2,prev = []},
-                 #emails{id = 2,email = 3,next = 1,prev = []},
-                 #emails{id = 1,email = 2,next = [],prev = []}],
-         feed = {emails,1},
+ > kvx:take(kvx:bot((kvx:load_reader(1555175244188986000))#reader{args=-1})).
+ #reader{id = 1555175244188986000,pos = 5,
+         cache = {emails,1555175169127279000},
+         args = [#emails{id = 1555175169127279000,next = [],
+                         prev = 1555175169126314000,email = []},
+                 #emails{id = 1555175169126314000,next = 1555175169127279000,
+                         prev = 1555175169125227000,email = []},
+                 #emails{id = 1555175169125227000,next = 1555175169126314000,
+                         prev = 1555175169123405000,email = []},
+                 #emails{id = 1555175169123405000,next = 1555175169125227000,
+                         prev = 1555175169122304000,email = []},
+                 #emails{id = 1555175169122304000,next = 1555175169123405000,
+                         prev = [],email = []}],
+         feed = {list,1555175169120161000},
          dir = 0}
 
 </code></figure>
