@@ -9,9 +9,9 @@ stop()     -> ok.
 destroy()  -> ok.
 version()  -> {version,"KVX ROCKSDB"}.
 dir()      -> [].
-leave() -> case application:get_env(kvx,rocks_ref,[]) of [] -> skip; X -> rocksdb:close(X) end.
+leave() -> case ref() of [] -> skip; X -> rocksdb:close(X) end.
 join(_) -> leave(), {ok, Ref} = rocksdb:open(application:get_env(kvx,rocks_name,"rocksdb"), [{create_if_missing, true}]),
-            application:set_env(kvx,rocks_ref,Ref).
+           application:set_env(kvx,rocks_ref,Ref).
 change_storage(_,_) -> ok.
 initialize() -> [ kvx:init(kvx_rocks,Module) || Module <- kvx:modules() ].
 ref() -> application:get_env(kvx,rocks_ref,[]).
