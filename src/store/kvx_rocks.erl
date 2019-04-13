@@ -41,6 +41,6 @@ next(I,Key,S,A,X,T) ->
                        [binary_to_term(X,[safe])|T]);
                   _ -> T end.
 
-seq(R, I) -> kvx_mnesia:seq(R, I).
+seq(R, I) -> os:system_time().
 create_table(_,_) -> [].
 add_table_index(_, _) -> ok.
