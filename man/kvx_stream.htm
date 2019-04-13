@@ -53,47 +53,6 @@
     </section>
     <section>
 
-<h3>SESSION</h3>
-
-<figure><code>
- > kvx:join().
- [[{table,id_seq,false,set,[thing,id],[thing],disc_copies}],
-  [{table,writer,false,set,[id,count,cache,args,first],[],disc_copies},
-   {table,emails,false,set,[id,email,next,prev],[],disc_copies},
-   {table,reader,false,set,[id,pos,cache,args,feed,dir],[],disc_copies}]]
-
- > kvx:check().
- ok
-
- > kvx:all(reader).
- [{reader,1,0,[],[],{emails,1},0},
-  {reader,2,0,[],[],{emails,1},0}]
-
- > rr(kvx).
- [emails,id_seq,iter,kvx,reader,schema,table,writer]
-
- > kvx:save(kvx:reader({emails,1})).
- #reader{id = 3,pos = 0,
-         cache = {emails,1},
-         args = [],
-         feed = {emails,1},
-         dir = 0}
-
- > kvx:take(kvx:bot((kvx:load_reader(3))#reader{args=-1})).
- #reader{id = 3,pos = 5,
-         cache = {emails,5},
-         args = [#emails{id = 5,email = [],next = 4,prev = []},
-                 #emails{id = 4,email = 5,next = 3,prev = []},
-                 #emails{id = 3,email = 4,next = 2,prev = []},
-                 #emails{id = 2,email = 3,next = 1,prev = []},
-                 #emails{id = 1,email = 2,next = [],prev = []}],
-         feed = {emails,1},
-         dir = 0}
-
-</code></figure>
-    </section>
-    <section>
-
 <h3>WRITER</h3>
 
 <p>Writer cursor represents append list chain with some cached values.
