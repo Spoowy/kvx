@@ -1,5 +1,5 @@
 -module(kvx).
--description('KVX Abstract Chain Storage').
+-description('KVX Abstract Chain Store').
 -include_lib("stdlib/include/assert.hrl").
 -include("api.hrl").
 -include("metainfo.hrl").
@@ -13,6 +13,7 @@
 % kvx api
 
 dba()              -> application:get_env(kvx,dba,store_mnesia).
+kvx_stream()       -> application:get_env(kvx,dba_st,kvx_stream).
 all(Table)         -> all     (Table, #kvx{mod=dba()}).
 delete(Table,Key)  -> delete  (Table, Key, #kvx{mod=dba()}).
 get(Table,Key)     -> ?MODULE:get     (Table, Key, #kvx{mod=dba()}).
@@ -35,23 +36,23 @@ seq(Table,DX)      -> seq     (Table, DX, #kvx{mod=dba()}).
 
 % stream api
 
-top  (X) -> kvx_stream:top (X).
-bot  (X) -> kvx_stream:bot (X).
-next (X) -> kvx_stream:next(X).
-prev (X) -> kvx_stream:prev(X).
-drop (X) -> kvx_stream:drop(X).
-take (X) -> kvx_stream:take(X).
-save (X) -> kvx_stream:save(X).
-up   (X) -> kvx_stream:up  (X).
-down (X) -> kvx_stream:down(X).
-add  (X) -> kvx_stream:add (X).
-load_writer (X) -> kvx_stream:load_writer(X).
-load_reader (X) -> kvx_stream:load_reader(X).
-writer      (X) -> kvx_stream:writer(X).
-reader      (X) -> kvx_stream:reader(X).
+top  (X) -> (kvx_stream()):top (X).
+bot  (X) -> (kvx_stream()):bot (X).
+next (X) -> (kvx_stream()):next(X).
+prev (X) -> (kvx_stream()):prev(X).
+drop (X) -> (kvx_stream()):drop(X).
+take (X) -> (kvx_stream()):take(X).
+save (X) -> (kvx_stream()):save(X).
+up   (X) -> (kvx_stream()):up  (X).
+down (X) -> (kvx_stream()):down(X).
+add  (X) -> (kvx_stream()):add (X).
+load_writer (X) -> (kvx_stream()):load_writer(X).
+load_reader (X) -> (kvx_stream()):load_reader(X).
+writer      (X) -> (kvx_stream()):writer(X).
+reader      (X) -> (kvx_stream()):reader(X).
 
-metainfo() ->  #schema { name = kvx , tables = core() }.
-core()    -> [ #table { name = id_seq , fields = record_info(fields,id_seq) , keys=[thing]} ].
+metainfo() ->  #schema { name = kvx, tables = core() }.
+core()    -> [ #table { name = id_seq, fields = record_info(fields,id_seq), keys=[thing]} ].
 
 init(Backend, Module) ->
     [ begin

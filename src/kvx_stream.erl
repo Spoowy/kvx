@@ -1,5 +1,5 @@
 -module(kvx_stream).
--description('KVX: STREAM').
+-description('KVX STREAM for ALL').
 -include("kvx.hrl").
 -include("stream.hrl").
 -include("metainfo.hrl").
