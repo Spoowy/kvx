@@ -1,5 +1,5 @@
 {application, kvx,
-   [{description, "KVX Abstract Chain Storage"},
+   [{description, "KVX Abstract Chain Database"},
     {vsn, "6.4"},
     {registered, []},
     {applications, [kernel,stdlib,mnesia]},
