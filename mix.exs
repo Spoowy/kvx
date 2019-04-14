@@ -3,7 +3,7 @@ defmodule KVX.Mixfile do
 
   def project do
     [app: :kvx,
-     version: "5.11.0",
+     version: "6.4.0",
      description: "Erlang Abstract Database",
      package: package]
   end
