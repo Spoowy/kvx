@@ -13,7 +13,6 @@ join(_Node) -> filelib:ensure_dir("data/"). % should be rsync or smth
 change_storage(_Table,_Type) -> ok.
 
 initialize() ->
-    kvx:info(?MODULE,"fs init.~n",[]),
     mnesia:create_schema([node()]),
     [ kvx:init(kvx_fs,Module) || Module <- kvx:modules() ],
     mnesia:wait_for_tables([ T#table.name || T <- kvx:tables()],infinity).

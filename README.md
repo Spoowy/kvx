@@ -8,7 +8,7 @@ Features
 * Polymorphic Tuples aka Extensible Records
 * Basic Schema for Storing Chains
 * Backends: MNESIA, FS, ROCKSDB
-* Extremely Compact: 420 LOC
+* Extremely Compact: 500 LOC
 
 Usage
 -----

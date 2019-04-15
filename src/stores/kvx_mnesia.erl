@@ -22,7 +22,6 @@ join(Node) ->
 change_storage(Table,Type) -> mnesia:change_table_copy_type(Table, node(), Type).
 
 initialize() ->
-    kvx:info(?MODULE,"mnesia init.~n",[]),
     mnesia:create_schema([node()]),
     Res = [ kvx:init(kvx_mnesia,Module) || Module <- kvx:modules() ],
     mnesia:wait_for_tables([ T#table.name || T <- kvx:tables()],infinity),
@@ -47,10 +46,7 @@ seq(RecordName, Incr) -> mnesia:dirty_update_counter({id_seq, RecordName}, Incr)
 many(Fun) -> case mnesia:activity(context(),Fun) of {atomic, R} -> R; {aborted, Error} -> {error, Error}; X -> X end.
 void(Fun) -> case mnesia:activity(context(),Fun) of {atomic, ok} -> ok; {aborted, Error} -> {error, Error}; X -> X end.
 info(T) -> try mnesia:table_info(T,all) catch _:_ -> [] end.
-create_table(Name,Options) ->
-    X = mnesia:create_table(Name, Options),
-    kvx:info(?MODULE,"Create table ~p ~nOptions ~p~nReturn ~p~n",[Name, Options,X]),
-    X.
+create_table(Name,Options) -> mnesia:create_table(Name, Options).
 add_table_index(Record, Field) -> mnesia:add_table_index(Record, Field).
 exec(Q) -> F = fun() -> qlc:e(Q) end, {atomic, Val} = mnesia:activity(context(),F), Val.
 just_one(Fun) ->

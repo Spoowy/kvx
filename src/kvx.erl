@@ -5,10 +5,9 @@
 -include("metainfo.hrl").
 -include("stream.hrl").
 -include("kvx.hrl").
--export([info/3,warning/3,error/3,trace/3,dump/0,check/0]).
+-export([dump/0,check/0,metainfo/0]).
 -export(?API).
 -export(?STREAM).
--export([metainfo/0]).
 
 % kvx api
 
@@ -114,31 +113,6 @@ seq(Tab, Incr,#kvx{mod=DBA}) -> DBA:seq(case table(Tab) of #table{} -> atom_to_l
 notify(_EventPath, _Data) -> skip.
 
 dump(#kvx{mod=Mod}) -> Mod:dump().
-
-logger()       -> application:get_env(?MODULE,logger,n2o_io).
-log_modules()  -> application:get_env(?MODULE,log_modules,[]).
-log_level()    -> application:get_env(?MODULE,log_level,info).
-
-level(none)    -> 4;
-level(error)   -> 3;
-level(warning) -> 2;
-level(trace)   -> 1;
-level(_)       -> 0.
-
-log(M,F,A,Fun) ->
-    case level(Fun) < level(log_level()) of
-         true  -> skip;
-         false -> case    log_modules() of
-             any       -> (logger()):Fun(M,F,A);
-             []        -> skip;
-             Allowed   -> case lists:member(M, Allowed) of
-                 true  -> (logger()):Fun(M,F,A);
-                 false -> skip end end end.
-
-info   (Module, String, Args) -> log(Module,  String, Args, info).
-trace  (Module, String, Args) -> log(Module,  String, Args, trace).
-warning(Module, String, Args) -> log(Module,  String, Args, warning).
-error  (Module, String, Args) -> log(Module,  String, Args, error).
 
 % tests
 
