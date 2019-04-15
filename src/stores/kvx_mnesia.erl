@@ -23,7 +23,7 @@ change_storage(Table,Type) -> mnesia:change_table_copy_type(Table, node(), Type)
 
 initialize() ->
     mnesia:create_schema([node()]),
-    Res = [ kvx:init(kvx_mnesia,Module) || Module <- kvx:modules() ],
+    Res = [ kvx:initialize(kvx_mnesia,Module) || Module <- kvx:modules() ],
     mnesia:wait_for_tables([ T#table.name || T <- kvx:tables()],infinity),
     Res.
 

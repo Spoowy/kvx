@@ -3,5 +3,5 @@
     {vsn, "6.4"},
     {registered, []},
     {applications, [kernel,stdlib]},
-    {mod, { kvx_sup, []}},
+    {mod, { kvx, []}},
     {env, []} ]}.

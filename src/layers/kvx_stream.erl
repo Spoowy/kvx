@@ -1,10 +1,17 @@
 -module(kvx_stream).
--description('KVX STREAM for ALL').
+-description('KVX STREAM LAYER').
 -include("kvx.hrl").
 -include("stream.hrl").
 -include("metainfo.hrl").
 -export(?STREAM).
 -export([metainfo/0]).
+
+% boot for sample
+
+-record(emails, { id    = [] :: [] | integer(),
+                  next  = [] :: [] | integer(),
+                  prev  = [] :: [] | integer(),
+                  email = [] :: [] | binary() }).
 
 metainfo() -> #schema { name = kvx,    tables = tables() }.
 tables() -> [ #table  { name = writer, fields = record_info(fields, writer) },

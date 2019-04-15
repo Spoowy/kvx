@@ -1,4 +1,6 @@
 -module(kvx).
+-behaviour(application).
+-behaviour(supervisor).
 -description('KVX Abstract Chain Store').
 -include_lib("stdlib/include/assert.hrl").
 -include("api.hrl").
@@ -8,6 +10,11 @@
 -export([dump/0,check/0,metainfo/0]).
 -export(?API).
 -export(?STREAM).
+-export([init/1, start/2, stop/1]).
+
+init([]) -> {ok, { {one_for_one, 5, 10}, []} }.
+start(_,_) -> supervisor:start_link({local, kvx}, kvx, []).
+stop(_) -> ok.
 
 % kvx api
 
@@ -26,8 +33,8 @@ count(Table)       -> count   (Table, #kvx{mod=dba()}).
 put(Record)        -> ?MODULE:put     (Record, #kvx{mod=dba()}).
 fold(Fun,Acc,T,S,C,D) -> fold (Fun,Acc,T,S,C,D, #kvx{mod=dba()}).
 info(T)            -> info    (T, #kvx{mod=dba()}).
+stop()             -> stop_kvx(#kvx{mod=dba()}).
 start()            -> start   (#kvx{mod=dba()}).
-stop()             -> stop    (#kvx{mod=dba()}).
 destroy()          -> destroy (#kvx{mod=dba()}).
 ver()              -> ver(#kvx{mod=dba()}).
 dir()              -> dir     (#kvx{mod=dba()}).
@@ -53,7 +60,7 @@ reader      (X) -> (kvx_stream()):reader(X).
 metainfo() ->  #schema { name = kvx, tables = core() }.
 core()    -> [ #table { name = id_seq, fields = record_info(fields,id_seq), keys=[thing]} ].
 
-init(Backend, Module) ->
+initialize(Backend, Module) ->
     [ begin
         Backend:create_table(T#table.name, [{attributes,T#table.fields},
                {T#table.copy_type, [node()]},{type,T#table.type}]),
@@ -63,7 +70,7 @@ init(Backend, Module) ->
 
 all(Tab,#kvx{mod=DBA}) -> DBA:all(Tab).
 start(#kvx{mod=DBA}) -> DBA:start().
-stop(#kvx{mod=DBA}) -> DBA:stop().
+stop_kvx(#kvx{mod=DBA}) -> DBA:stop().
 change_storage(Type) -> [ change_storage(Name,Type) || #table{name=Name} <- kvx:tables() ].
 change_storage(Table,Type,#kvx{mod=DBA}) -> DBA:change_storage(Table,Type).
 destroy(#kvx{mod=DBA}) -> DBA:destroy().
@@ -115,6 +122,11 @@ notify(_EventPath, _Data) -> skip.
 dump(#kvx{mod=Mod}) -> Mod:dump().
 
 % tests
+
+-record(emails, { id    = [] :: [] | integer(),
+                  next  = [] :: [] | integer(),
+                  prev  = [] :: [] | integer(),
+                  email = [] :: [] | binary() }).
 
 check() ->
     Id  = {list,kvx:seq(writer,1)},

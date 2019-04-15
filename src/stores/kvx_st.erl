@@ -1,5 +1,5 @@
 -module(kvx_st).
--description('KVX STREAM for ROCKS').
+-description('KVX STREAM NATIVE ROCKS').
 -include("kvx.hrl").
 -include("stream.hrl").
 -include("metainfo.hrl").
