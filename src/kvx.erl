@@ -6,6 +6,7 @@
 -include("api.hrl").
 -include("metainfo.hrl").
 -include("stream.hrl").
+-include("cursors.hrl").
 -include("kvx.hrl").
 -export([dump/0,check/0,metainfo/0]).
 -export(?API).
