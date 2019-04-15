@@ -20,7 +20,7 @@ initialize() -> [ kvx:init(kvx_rocks,Module) || Module <- kvx:modules() ].
 ref() -> application:get_env(kvx,rocks_ref,[]).
 index(_,_,_) -> ok.
 get(Tab, Key) ->
-    Address = <<(list_to_binary(lists:concat(["/",Tab,"/"])))/binary,(term_to_binary(Key))/binary>>,
+    Address = <<(list_to_binary(lists:concat(["/",io_lib:format("~p",[Tab]),"/"])))/binary,(term_to_binary(Key))/binary>>,
     case rocksdb:get(ref(), Address, []) of
          not_found -> {error,not_found};
          {ok,Bin} -> {ok,binary_to_term(Bin,[safe])} end.
