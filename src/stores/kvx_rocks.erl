@@ -32,7 +32,7 @@ put(Record) -> rocksdb:put(ref(), <<(list_to_binary(lists:concat(["/",element(1,
 delete(_Tab, _Key) -> ok.
 count(_) -> 0.
 all(R) -> {ok,I} = rocksdb:iterator(ref(), []),
-           Key = list_to_binary(lists:concat(["/",R])),
+           Key = list_to_binary(lists:concat(["/",io_lib:format("~p",[R])])),
            First = rocksdb:iterator_move(I, {seek,Key}),
            lists:reverse(next(I,Key,size(Key),First,[],[],-1,0)).
 
