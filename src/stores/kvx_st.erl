@@ -80,7 +80,7 @@ load_reader (Id) ->
          {ok,#reader{}=C} -> C#reader{cache=element(2,rocksdb:iterator(ref(),[]))};
               E -> E end.
 
-writer (Id) -> case kvx:get(writer,Id) of {ok,W} -> W; {error,_} -> kvx:save(#writer{id=Id}) end.
+writer (Id) -> case kvx:get(writer,Id) of {ok,W} -> W; {error,_} -> #writer{id=Id} end.
 reader (Id) ->
     case kvx:get(writer,Id) of
          {ok,#writer{}} ->

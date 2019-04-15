@@ -8,7 +8,7 @@
 -include("stream.hrl").
 -include("cursors.hrl").
 -include("kvx.hrl").
--export([dump/0,check/0,metainfo/0]).
+-export([dump/0,check/0,metainfo/0,ensure/1]).
 -export(?API).
 -export(?STREAM).
 -export([init/1, start/2, stop/1]).
@@ -57,6 +57,10 @@ load_writer (X) -> (kvx_stream()):load_writer(X).
 load_reader (X) -> (kvx_stream()):load_reader(X).
 writer      (X) -> (kvx_stream()):writer(X).
 reader      (X) -> (kvx_stream()):reader(X).
+ensure(#writer{id=Id}) ->
+   case kvx:get(writer,Id) of
+        {error,_} -> kvx:save(kvx:writer(Id)), ok;
+        {ok,_}    -> ok end.
 
 metainfo() ->  #schema { name = kvx, tables = core() }.
 core()    -> [ #table { name = id_seq, fields = record_info(fields,id_seq), keys=[thing]} ].

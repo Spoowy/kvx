@@ -62,14 +62,17 @@ p({ok,R},C,P)    -> r(kvx:get(tab(R),ep(R)),C,P);
 p({error,X},_,_) -> {error,X}.
 r({ok,R},C,P)    -> C#reader{cache={tab(R),id(R)},pos=P};
 r({error,X},_,_) -> {error,X}.
+w({ok,#writer{first=[]}},bot,C)           -> C#reader{cache=[],pos=1};
 w({ok,#writer{first=B}},bot,C)            -> C#reader{cache={tab(B),id(B)},pos=1};
 w({ok,#writer{cache=B,count=Size}},top,C) -> C#reader{cache={tab(B),id(B)},pos=Size};
 w({error,X},_,_)                          -> {error,X}.
 
 % section: take, drop
 
-drop(#reader{dir=D,cache=B,args=N,pos=P}=C) -> drop(acc(D),N,C,C,P,B).
-take(#reader{dir=D,cache=B,args=N,pos=P}=C) -> take(acc(D),N,C,C,[],P,B).
+drop(#reader{dir=D,cache=[],args=N,pos=P}=C) -> C#reader{args=[]};
+drop(#reader{dir=D,cache=B,args=N,pos=P}=C)  -> drop(acc(D),N,C,C,P,B).
+take(#reader{dir=D,cache=[],args=N,pos=P}=C) -> C#reader{args=[]};
+take(#reader{dir=D,cache=B,args=N,pos=P}=C)  -> take(acc(D),N,C,C,[],P,B).
 
 take(_,_,{error,_},C2,R,P,B) -> C2#reader{args=lists:flatten(R),pos=P,cache=B};
 take(_,0,_,C2,R,P,B)         -> C2#reader{args=lists:flatten(R),pos=P,cache=B};
@@ -85,12 +88,11 @@ drop(A,N,#reader{cache=B,pos=P}=C,C2,_,_) ->
 
 load_writer (Id) -> case kvx:get(writer,Id) of {ok,C} -> C; E -> E end.
 load_reader (Id) -> case kvx:get(reader,Id) of {ok,C} -> C; E -> E end.
-writer (Id) -> #writer{id=Id}.
-reader (Id) ->
-    case kvx:get(writer,Id) of
+writer (Id) -> case kvx:get(writer,Id) of {ok,W} -> W; E -> #writer{id=Id} end.
+reader (Id) -> case kvx:get(writer,Id) of
          {ok,#writer{first=[]}} -> #reader{id=kvx:seq(reader,1),feed=Id,cache=[]};
          {ok,#writer{first=F}}  -> #reader{id=kvx:seq(reader,1),feed=Id,cache={tab(F),id(F)}};
-         {error,X} -> {error,X} end.
+         {error,X} -> kvx:save(#writer{id=Id}), reader(Id) end.
 save (C) -> NC = c4(C,[]), kvx:put(NC), NC.
 up   (C) -> C#reader{dir=0}.
 down (C) -> C#reader{dir=1}.
