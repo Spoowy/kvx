@@ -38,7 +38,7 @@ all(R) -> {ok,I} = rocksdb:iterator(ref(), []),
 
 next(_,_,_,_,_,T,N,C) when C == N -> T;
 next(I,Key,S,{ok,A,X},_,T,N,C) -> next(I,Key,S,A,X,T,N,C);
-next(_,___,_,{error,_},_,T,N_,_) -> T;
+next(_,___,_,{error,_},_,T,_,_) -> T;
 next(I,Key,S,A,X,T,N,C) ->
      case binary:part(A,0,S) of Key ->
           next(I,Key,S,rocksdb:iterator_move(I, next), [],

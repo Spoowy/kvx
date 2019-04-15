@@ -95,8 +95,8 @@ save (C) -> NC = c4(C,[]), N2 = c3(NC,[]), kvx:put(N2), N2.
 add(#writer{args=M}=C) when element(2,M) == [] -> add(si(M,kvx:seq([],[])),C);
 add(#writer{args=M}=C) -> add(M,C).
 
-add(M,#writer{id=Feed,count=S}=C) ->
+add(M,#writer{id=Feed,count=S}=C) -> NS=S+1,
     rocksdb:put(ref(),
        <<(list_to_binary(lists:concat(["/",io_lib:format("~p",[Feed]),"/"])))/binary,
          (term_to_binary(id(M)))/binary>>, term_to_binary(M), [{sync,true}]),
-    C#writer{cache=M,count=S+1}.
+    C#writer{cache=M,count=NS}.
