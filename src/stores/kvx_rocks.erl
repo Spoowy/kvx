@@ -45,7 +45,7 @@ next(I,Key,S,A,X,T,N,C) ->
                        [binary_to_term(X,[safe])|T],N,C+1);
                   _ -> T end.
 
-seq(_,_) -> os:system_time().
+seq(_,_) -> integer_to_list(os:system_time()).
 create_table(_,_) -> [].
 add_table_index(_, _) -> ok.
 dump() -> ok.
