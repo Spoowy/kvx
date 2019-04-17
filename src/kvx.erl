@@ -53,6 +53,7 @@ save (X) -> (kvx_stream()):save(X).
 up   (X) -> (kvx_stream()):up  (X).
 down (X) -> (kvx_stream()):down(X).
 add  (X) -> (kvx_stream()):add (X).
+append  (X, Y) -> (kvx_stream()):append (X, Y).
 load_writer (X) -> (kvx_stream()):load_writer(X).
 load_reader (X) -> (kvx_stream()):load_reader(X).
 writer      (X) -> (kvx_stream()):writer(X).

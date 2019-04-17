@@ -100,3 +100,10 @@ add(M,#writer{id=Feed,count=S}=C) -> NS=S+1,
        <<(list_to_binary(lists:concat(["/",io_lib:format("~p",[Feed]),"/"])))/binary,
          (term_to_binary(id(M)))/binary>>, term_to_binary(M), [{sync,true}]),
     C#writer{cache=M,count=NS}.
+
+append(Rec,Feed) ->
+   kvx:ensure(#writer{id=Feed}),
+   Id = element(2,Rec),
+   case kvx:get(Feed,Id) of
+        {ok,_}    -> Id;
+        {error,_} -> kvx:save(kvx:add((kvx:writer(Feed))#writer{args=Rec})), Id end.

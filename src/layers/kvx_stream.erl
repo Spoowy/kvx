@@ -114,3 +114,11 @@ add(M,#writer{cache=V1,count=S}=C) ->
     {ok,V} = kvx:get(tab(V1),id(V1)),
     N=sp(sn(M,[]),id(V)), P=sn(V,id(M)), kvx:put([N,P]),
     C#writer{cache=N,count=S+1}.
+
+append(Rec,Feed) ->
+   kvx:ensure(#writer{id=Feed}),
+   Name = element(1,Rec),
+   Id = element(2,Rec),
+   case kvx:get(Name,Id) of
+        {ok,_}    -> Id;
+        {error,_} -> kvx:save(kvx:add((kvx:writer(Feed))#writer{args=Rec})), Id end.
