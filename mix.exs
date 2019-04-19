@@ -5,7 +5,8 @@ defmodule KVX.Mixfile do
     [app: :kvx,
      version: "6.4.0",
      description: "Abstract Chain Database",
-     package: package()]
+     package: package(),
+     deps: deps()]
   end
 
   defp package do
