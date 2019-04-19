@@ -13,4 +13,9 @@ defmodule KVX.Mixfile do
      licenses: ["MIT"],
      links: %{"GitHub" => "https://github.com/synrc/kvx"}]
    end
+
+   defp deps do
+     [{:ex_doc, ">= 0.0.0", only: :dev}]
+   end
+
 end
