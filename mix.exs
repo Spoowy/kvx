@@ -9,7 +9,7 @@ defmodule KVX.Mixfile do
   end
 
   defp package do
-    [files: ~w(c_src include priv src LICENSE package.exs README.md rebar.config),
+    [files: ~w(include priv man etc src LICENSE mix.exs README.md rebar.config sys.config),
      licenses: ["MIT"],
      links: %{"GitHub" => "https://github.com/synrc/kvx"}]
    end
