@@ -122,3 +122,5 @@ append(Rec,Feed) ->
    case kvx:get(Name,Id) of
         {ok,_}    -> Id;
         {error,_} -> kvx:save(kvx:add((kvx:writer(Feed))#writer{args=Rec})), Id end.
+
+cut(Feed,Id) -> ok.
