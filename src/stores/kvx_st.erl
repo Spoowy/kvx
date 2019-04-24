@@ -113,7 +113,6 @@ prev(I,Key,S,{ok,A,X},_,T,N,C) -> prev(I,Key,S,A,X,T,N,C);
 prev(_,___,_,{error,_},_,_,_,C) -> C;
 prev(I,Key,S,A,X,T,N,C) when size(A) > S ->
      case binary:part(A,0,S) of Key ->
-          io:format("removal ~ts~n",[A]),
           rocksdb:delete(ref(), A, []),
           Next = rocksdb:iterator_move(I, prev),
           prev(I,Key, S, Next, [], A, N, C + 1);
