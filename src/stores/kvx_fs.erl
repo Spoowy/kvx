@@ -14,7 +14,7 @@ change_storage(_Table,_Type) -> ok.
 
 initialize() ->
     mnesia:create_schema([node()]),
-    [ kvx:init(kvx_fs,Module) || Module <- kvx:modules() ],
+    [ kvx:initialize(kvx_fs,Module) || Module <- kvx:modules() ],
     mnesia:wait_for_tables([ T#table.name || T <- kvx:tables()],infinity).
 
 index(_Tab,_Key,_Value) -> ok.

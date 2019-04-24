@@ -98,14 +98,12 @@ fold(___,Acc,_,[],_,_,_) -> Acc;
 fold(___,Acc,_,undefined,_,_,_) -> Acc;
 fold(___,Acc,_,_,0,_,_) -> Acc;
 fold(Fun,Acc,Table,Start,Count,Direction,Driver) ->
-    kvx:trace("FOLD: ~p~n",[{Table, Start, Driver}]),
     try
     case kvx:get(Table, Start, Driver) of
          {ok, R} -> Prev = element(Direction, R),
                     Count1 = case Count of C when is_integer(C) -> C - 1; _-> Count end,
                     fold(Fun, Fun(R,Acc), Table, Prev, Count1, Direction, Driver);
-          _Error -> kvx:error(?MODULE,"Error: ~p~n",[_Error]),
-                    Acc
+          _Error -> Acc
     end catch _:_ -> Acc end.
 
 seq_gen() ->
