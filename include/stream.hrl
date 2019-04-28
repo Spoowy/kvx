@@ -6,12 +6,12 @@
                  load_writer/1, load_reader/1, writer/1, reader/1, save/1, add/1]).
 -spec top(#reader{}) -> #reader{}.
 -spec bot(#reader{}) -> #reader{}.
--spec next(#reader{}) -> #reader{}.
--spec prev(#reader{}) -> #reader{}.
+-spec next(#reader{}) -> #reader{} | {error,term()}.
+-spec prev(#reader{}) -> #reader{} | {error,term()}.
 -spec drop(#reader{}) -> #reader{}.
 -spec take(#reader{}) -> #reader{}.
--spec load_writer (term()) -> {ok,term()} | {error,term()}.
--spec load_reader (integer()) -> {ok,term()} | {error,term()}.
+-spec load_writer (term()) -> #reader{} | {error,term()}.
+-spec load_reader (integer()) -> #reader{} | {error,term()}.
 -spec writer (term()) -> #writer{}.
 -spec reader (term()) -> #reader{}.
 -spec save (#reader{} | #writer{}) -> #reader{} | #writer{}.

@@ -17,7 +17,7 @@ initialize() ->
     [ kvx:initialize(kvx_fs,Module) || Module <- kvx:modules() ],
     mnesia:wait_for_tables([ T#table.name || T <- kvx:tables()],infinity).
 
-index(_Tab,_Key,_Value) -> ok.
+index(_Tab,_Key,_Value) -> [].
 get(TableName, Key) ->
     HashKey = encode(base64:encode(crypto:hash(sha, term_to_binary(Key)))),
     Dir = lists:concat(["data/",TableName,"/"]),
@@ -34,7 +34,7 @@ put(Record) ->
     File = lists:concat([Dir,HashKey]),
     file:write_file(File,BinaryValue,[write,raw,binary,sync]).
 
-delete(_Tab, _Key) -> ok.
+delete(_Tab, _Key) -> case kvx:get(_Tab,_Key) of {ok,_} -> ok; {error,X} -> {error,X} end.
 count(RecordName) -> length(filelib:fold_files(lists:concat(["data/",RecordName]), "",true, fun(A,Acc)-> [A|Acc] end, [])).
 all(R) -> lists:flatten([ begin case file:read_file(File) of
                         {ok,Binary} -> binary_to_term(Binary,[safe]);

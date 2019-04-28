@@ -10,7 +10,6 @@ ref() -> kvx_rocks:ref().
 % section: kvx_stream prelude
 
 se(X,Y,Z)  -> setelement(X,Y,Z).
-set(X,Y,Z) -> setelement(X,Z,Y).
 e(X,Y)  -> element(X,Y).
 c0(R,V) -> se(1, R, V).
 c1(R,V) -> se(#reader.id,    R, V).
@@ -35,10 +34,18 @@ acc(1)  -> prev.
 
 top  (#reader{}=C) -> C.
 bot  (#reader{}=C) -> C.
-next (#reader{}=C) -> C.
-prev (#reader{}=C) -> C.
-up   (#reader{}=C) -> C#reader{dir=0}.
-down (#reader{}=C) -> C#reader{dir=1}.
+
+next (#reader{cache=[]}) -> {error,empty};
+next (#reader{cache=I}=C) ->
+   case rocksdb:iterator_move(I, next) of
+        {ok,_,Bin} -> C#reader{cache=binary_to_term(Bin,[safe])};
+            {error,Reason} -> {error,Reason} end.
+
+prev (#reader{cache=[]}) -> {error,empty};
+prev (#reader{cache=I}=C) ->
+   case rocksdb:iterator_move(I, prev) of
+        {ok,_,Bin} -> C#reader{cache=binary_to_term(Bin,[safe])};
+            {error,Reason} -> {error,Reason} end.
 
 % section: take, drop
 
@@ -46,10 +53,9 @@ drop(#reader{args=N}) when N < 0 -> #reader{};
 
 drop(#reader{args=N,feed=Feed,cache=I}=C) when N == 0 ->
    Key = list_to_binary(lists:concat(["/",io_lib:format("~p",[Feed])])),
-   First = case rocksdb:iterator_move(I, {seek,Key}) of
-                {ok,_,Bin} -> binary_to_term(Bin,[safe]);
-                       _ -> [] end,
-   C#reader{cache=First};
+   case rocksdb:iterator_move(I, {seek,Key}) of
+        {ok,_,Bin} -> C#reader{cache=binary_to_term(Bin,[safe])};
+                 _ -> C#reader{cache=[]} end;
 
 drop(#reader{args=N,feed=Feed,cache=I}=C) when N > 0 ->
    Key   = list_to_binary(lists:concat(["/",io_lib:format("~p",[Feed])])),
@@ -86,7 +92,7 @@ reader (Id) ->
          {ok,#writer{}} ->
              {ok,I} = rocksdb:iterator(ref(), []),
              #reader{id=kvx:seq([],[]),feed=Id,cache=I};
-         {error,X} -> {error,X} end.
+         {error,X} -> #reader{} end.
 save (C) -> NC = c4(C,[]), N2 = c3(NC,[]), kvx:put(N2), N2.
 
 
@@ -108,10 +114,10 @@ append(Rec,Feed) ->
         {ok,_}    -> Id;
         {error,_} -> kvx:save(kvx:add((kvx:writer(Feed))#writer{args=Rec})), Id end.
 
-prev(_,_,_,_,_,T,N,C) when C == N -> C;
+prev(_,_,_,_,_,_,N,C) when C == N -> C;
 prev(I,Key,S,{ok,A,X},_,T,N,C) -> prev(I,Key,S,A,X,T,N,C);
 prev(_,___,_,{error,_},_,_,_,C) -> C;
-prev(I,Key,S,A,X,T,N,C) when size(A) > S ->
+prev(I,Key,S,A,_,_,N,C) when size(A) > S ->
      case binary:part(A,0,S) of Key ->
           rocksdb:delete(ref(), A, []),
           Next = rocksdb:iterator_move(I, prev),
