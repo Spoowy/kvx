@@ -107,3 +107,22 @@ append(Rec,Feed) ->
    case kvx:get(Feed,Id) of
         {ok,_}    -> Id;
         {error,_} -> kvx:save(kvx:add((kvx:writer(Feed))#writer{args=Rec})), Id end.
+
+prev(_,_,_,_,_,T,N,C) when C == N -> C;
+prev(I,Key,S,{ok,A,X},_,T,N,C) -> prev(I,Key,S,A,X,T,N,C);
+prev(_,___,_,{error,_},_,_,_,C) -> C;
+prev(I,Key,S,A,X,T,N,C) when size(A) > S ->
+     case binary:part(A,0,S) of Key ->
+          rocksdb:delete(ref(), A, []),
+          Next = rocksdb:iterator_move(I, prev),
+          prev(I,Key, S, Next, [], A, N, C + 1);
+                                  _ -> C end;
+prev(_,_,_,_,_,_,_,C) -> C.
+
+cut(Feed,Id) ->
+    Key    = list_to_binary(lists:concat(["/",io_lib:format("~p",[Feed]),"/"])),
+    A      = <<Key/binary,(term_to_binary(Id))/binary>>,
+    {ok,I} = rocksdb:iterator(ref(), []),
+    case rocksdb:iterator_move(I, {seek,A}) of
+         {ok,A,X} -> {ok,prev(I,Key,size(Key),A,X,[],-1,0)};
+                _ -> {error,"unknown"} end.

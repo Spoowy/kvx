@@ -50,8 +50,7 @@ prev (X) -> (kvx_stream()):prev(X).
 drop (X) -> (kvx_stream()):drop(X).
 take (X) -> (kvx_stream()):take(X).
 save (X) -> (kvx_stream()):save(X).
-up   (X) -> (kvx_stream()):up  (X).
-down (X) -> (kvx_stream()):down(X).
+cut  (X,Y) -> (kvx_stream()):cut (X,Y).
 add  (X) -> (kvx_stream()):add (X).
 append  (X, Y) -> (kvx_stream()):append (X, Y).
 load_writer (X) -> (kvx_stream()):load_writer(X).
