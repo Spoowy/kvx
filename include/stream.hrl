@@ -10,8 +10,8 @@
 -spec prev(#reader{}) -> #reader{} | {error,term()}.
 -spec drop(#reader{}) -> #reader{}.
 -spec take(#reader{}) -> #reader{}.
--spec load_writer (term()) -> {ok,term()} | {error,term()}.
--spec load_reader (integer()) -> {ok,term()} | {error,term()}.
+-spec load_writer (term()) -> #reader{} | {error,term()}.
+-spec load_reader (integer()) -> #reader{} | {error,term()}.
 -spec writer (term()) -> #writer{}.
 -spec reader (term()) -> #reader{}.
 -spec save (#reader{} | #writer{}) -> #reader{} | #writer{}.

@@ -53,6 +53,7 @@ bot(#reader{feed=F}=C) -> w(kvx:get(writer,F),bot,C).
 
 next(#reader{cache=[]}) -> {error,empty};
 next(#reader{cache={T,R},pos=P}=C) -> n(kvx:get(T,R),C,P+1).
+
 prev(#reader{cache=[]}) -> {error,empty};
 prev(#reader{cache={T,R},pos=P}=C) -> p(kvx:get(T,R),C,P-1).
 
