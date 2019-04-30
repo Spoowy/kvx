@@ -69,9 +69,9 @@ w({error,X},_,_)                          -> {error,X}.
 
 % section: take, drop
 
-drop(#reader{dir=D,cache=[],args=N,pos=P}=C) -> C#reader{args=[]};
+drop(#reader{cache=[]}=C) -> C#reader{args=[]};
 drop(#reader{dir=D,cache=B,args=N,pos=P}=C)  -> drop(acc(D),N,C,C,P,B).
-take(#reader{dir=D,cache=[],args=N,pos=P}=C) -> C#reader{args=[]};
+take(#reader{cache=[]}=C) -> C#reader{args=[]};
 take(#reader{dir=D,cache=B,args=N,pos=P}=C)  -> take(acc(D),N,C,C,[],P,B).
 
 take(_,_,{error,_},C2,R,P,B) -> C2#reader{args=lists:flatten(R),pos=P,cache=B};
@@ -88,14 +88,12 @@ drop(A,N,#reader{cache=B,pos=P}=C,C2,_,_) ->
 
 load_writer (Id) -> case kvx:get(writer,Id) of {ok,C} -> C; E -> E end.
 load_reader (Id) -> case kvx:get(reader,Id) of {ok,C} -> C; E -> E end.
-writer (Id) -> case kvx:get(writer,Id) of {ok,W} -> W; E -> #writer{id=Id} end.
+writer (Id) -> case kvx:get(writer,Id) of {ok,W} -> W; _ -> #writer{id=Id} end.
 reader (Id) -> case kvx:get(writer,Id) of
          {ok,#writer{first=[]}} -> #reader{id=kvx:seq(reader,1),feed=Id,cache=[]};
          {ok,#writer{first=F}}  -> #reader{id=kvx:seq(reader,1),feed=Id,cache={tab(F),id(F)}};
-         {error,X} -> kvx:save(#writer{id=Id}), reader(Id) end.
+         {error,_} -> kvx:save(#writer{id=Id}), reader(Id) end.
 save (C) -> NC = c4(C,[]), kvx:put(NC), NC.
-up   (C) -> C#reader{dir=0}.
-down (C) -> C#reader{dir=1}.
 
 % add
 
@@ -123,4 +121,5 @@ append(Rec,Feed) ->
         {ok,_}    -> Id;
         {error,_} -> kvx:save(kvx:add((kvx:writer(Feed))#writer{args=Rec})), Id end.
 
-cut(Feed,Id) -> ok.
+cut(Feed,Id) ->
+   kvx:delete(Feed,Id).

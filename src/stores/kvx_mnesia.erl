@@ -39,7 +39,7 @@ delete(Tab, Key) ->
     case mnesia:activity(context(),fun()-> mnesia:delete({Tab, Key}) end) of
         {aborted,Reason} -> {error,Reason};
         {atomic,_Result} -> ok;
-        X -> X end.
+        _ -> ok end.
 count(RecordName) -> mnesia:table_info(RecordName, size).
 all(R) -> lists:flatten(many(fun() -> L= mnesia:all_keys(R), [ mnesia:read({R, G}) || G <- L ] end)).
 seq([],[]) -> os:system_time();

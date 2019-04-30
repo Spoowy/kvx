@@ -18,7 +18,7 @@ join(_) -> application:start(rocksdb),
 change_storage(_,_) -> ok.
 initialize() -> [ kvx:initialize(kvx_rocks,Module) || Module <- kvx:modules() ].
 ref() -> application:get_env(kvx,rocks_ref,[]).
-index(_,_,_) -> ok.
+index(_,_,_) -> [].
 get(Tab, Key) ->
     Address = <<(list_to_binary(lists:concat(["/",io_lib:format("~p",[Tab]),"/"])))/binary,(term_to_binary(Key))/binary>>,
     case rocksdb:get(ref(), Address, []) of
@@ -29,7 +29,11 @@ put(Records) when is_list(Records) -> lists:map(fun(Record) -> put(Record) end, 
 put(Record) -> rocksdb:put(ref(), <<(list_to_binary(lists:concat(["/",element(1,Record),"/"])))/binary,
                                     (term_to_binary(element(2,Record)))/binary>>, term_to_binary(Record), [{sync,true}]).
 
-delete(_Tab, _Key) -> ok.
+delete(Feed, Id) ->
+    Key    = list_to_binary(lists:concat(["/",io_lib:format("~p",[Feed]),"/"])),
+    A      = <<Key/binary,(term_to_binary(Id))/binary>>,
+    rocksdb:delete(ref(), A, []).
+
 count(_) -> 0.
 all(R) -> {ok,I} = rocksdb:iterator(ref(), []),
            Key = list_to_binary(lists:concat(["/",io_lib:format("~p",[R])])),
