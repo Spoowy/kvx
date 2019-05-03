@@ -8,7 +8,8 @@
 -include("stream.hrl").
 -include("cursors.hrl").
 -include("kvx.hrl").
--export([dump/0,check/0,metainfo/0,ensure/1]).
+-include("backend.hrl").
+-export([dump/0,check/0,metainfo/0,ensure/1,seq_gen/0,fold/6,fold/7]).
 -export(?API).
 -export(?STREAM).
 -export([init/1, start/2, stop/1]).
@@ -25,7 +26,7 @@ all(Table)         -> all     (Table, #kvx{mod=dba()}).
 delete(Table,Key)  -> delete  (Table, Key, #kvx{mod=dba()}).
 get(Table,Key)     -> ?MODULE:get     (Table, Key, #kvx{mod=dba()}).
 index(Table,K,V)   -> index   (Table, K,V, #kvx{mod=dba()}).
-change_storage(Table,Type) -> change_storage(Table,Type, #kvx{mod=dba()}).
+%change_storage(Table,Type) -> change_storage(Table,Type, #kvx{mod=dba()}).
 join()             -> join    ([],    #kvx{mod=dba()}).
 dump()             -> dump    (#kvx{mod=dba()}).
 join(Node)         -> join    (Node,  #kvx{mod=dba()}).
@@ -33,10 +34,9 @@ leave()            -> leave   (#kvx{mod=dba()}).
 count(Table)       -> count   (Table, #kvx{mod=dba()}).
 put(Record)        -> ?MODULE:put     (Record, #kvx{mod=dba()}).
 fold(Fun,Acc,T,S,C,D) -> fold (Fun,Acc,T,S,C,D, #kvx{mod=dba()}).
-info(T)            -> info    (T, #kvx{mod=dba()}).
 stop()             -> stop_kvx(#kvx{mod=dba()}).
 start()            -> start   (#kvx{mod=dba()}).
-destroy()          -> destroy (#kvx{mod=dba()}).
+%destroy()          -> destroy (#kvx{mod=dba()}).
 ver()              -> ver(#kvx{mod=dba()}).
 dir()              -> dir     (#kvx{mod=dba()}).
 seq(Table,DX)      -> seq     (Table, DX, #kvx{mod=dba()}).
@@ -53,7 +53,6 @@ save (X) -> (kvx_stream()):save(X).
 cut  (X,Y) -> (kvx_stream()):cut (X,Y).
 add  (X) -> (kvx_stream()):add (X).
 append  (X, Y) -> (kvx_stream()):append (X, Y).
-load_writer (X) -> (kvx_stream()):load_writer(X).
 load_reader (X) -> (kvx_stream()):load_reader(X).
 writer      (X) -> (kvx_stream()):writer(X).
 reader      (X) -> (kvx_stream()):reader(X).
@@ -76,9 +75,9 @@ initialize(Backend, Module) ->
 all(Tab,#kvx{mod=DBA}) -> DBA:all(Tab).
 start(#kvx{mod=DBA}) -> DBA:start().
 stop_kvx(#kvx{mod=DBA}) -> DBA:stop().
-change_storage(Type) -> [ change_storage(Name,Type) || #table{name=Name} <- kvx:tables() ].
-change_storage(Table,Type,#kvx{mod=DBA}) -> DBA:change_storage(Table,Type).
-destroy(#kvx{mod=DBA}) -> DBA:destroy().
+%change_storage(Type) -> [ change_storage(Name,Type) || #table{name=Name} <- kvx:tables() ].
+%change_storage(Table,Type,#kvx{mod=DBA}) -> DBA:change_storage(Table,Type).
+%destroy(#kvx{mod=DBA}) -> DBA:destroy().
 join(Node,#kvx{mod=DBA}) -> DBA:join(Node).
 leave(#kvx{mod=DBA}) -> DBA:leave().
 ver(#kvx{mod=DBA}) -> DBA:version().
@@ -86,7 +85,6 @@ tables() -> lists:flatten([ (M:metainfo())#schema.tables || M <- modules() ]).
 table(Name) when is_atom(Name) -> lists:keyfind(Name,#table.name,tables());
 table(_) -> false.
 dir(#kvx{mod=DBA}) -> DBA:dir().
-info(T,#kvx{mod=DBA}) -> DBA:info(T).
 modules() -> application:get_env(kvx,schema,[]).
 cursors() ->
     lists:flatten([ [ {T#table.name,T#table.fields}
@@ -119,9 +117,7 @@ get(RecordName, Key, #kvx{mod=Mod}) -> Mod:get(RecordName, Key).
 delete(Tab, Key, #kvx{mod=Mod}) -> Mod:delete(Tab, Key).
 count(Tab,#kvx{mod=DBA}) -> DBA:count(Tab).
 index(Tab, Key, Value,#kvx{mod=DBA}) -> DBA:index(Tab, Key, Value).
-seq(Tab, Incr,#kvx{mod=DBA}) -> DBA:seq(case table(Tab) of #table{} -> atom_to_list(Tab); _ -> Tab end, Incr).
-notify(_EventPath, _Data) -> skip.
-
+seq(Tab, Incr,#kvx{mod=DBA}) -> DBA:seq(Tab, Incr).
 dump(#kvx{mod=Mod}) -> Mod:dump().
 
 % tests
@@ -137,8 +133,7 @@ check() ->
     _W   = kvx:save(kvx:writer(Id)),
     #reader{id=R1} = kvx:save(kvx:reader(Id)),
     #reader{id=R2} = kvx:save(kvx:reader(Id)),
-    [ kvx:save(kvx:add((kvx:load_writer(Id))
-      #writer{args=#emails{}})) || _ <- lists:seq(1,X) ],
+    [ kvx:save(kvx:add((kvx:writer(Id))#writer{args=#emails{}})) || _ <- lists:seq(1,X) ],
     Bot = kvx:bot(kvx:load_reader(R1)),
     Top = kvx:top(kvx:load_reader(R2)),
     #reader{args=F} = kvx:take(Bot#reader{args=20,dir=0}),

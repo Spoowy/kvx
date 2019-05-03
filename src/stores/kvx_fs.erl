@@ -9,9 +9,7 @@ stop()     -> ok.
 destroy()  -> ok.
 version()  -> {version,"KVX FS"}.
 dir()      -> [ {table,F} || F <- filelib:wildcard("data/*"), filelib:is_dir(F) ].
-join(_Node) -> filelib:ensure_dir("data/"). % should be rsync or smth
-change_storage(_Table,_Type) -> ok.
-
+join(_Node) -> filelib:ensure_dir("data/"), initialize(). % should be rsync or smth
 initialize() ->
     mnesia:create_schema([node()]),
     [ kvx:initialize(kvx_fs,Module) || Module <- kvx:modules() ],

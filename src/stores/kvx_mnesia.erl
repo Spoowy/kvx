@@ -5,6 +5,7 @@
 -include_lib("mnesia/src/mnesia.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 -export(?BACKEND).
+-export([info/1,exec/1,sync_indexes/0,sync_indexes/1,dump/1]).
 start()    -> mnesia:start().
 stop()     -> mnesia:stop().
 destroy()  -> [mnesia:delete_table(T)||{_,T}<-kvx:dir()], mnesia:delete_schema([node()]), ok.
@@ -19,7 +20,7 @@ join(Node) ->
      || {Tb, [{N, Type}]} <- [{T, mnesia:table_info(T, where_to_commit)}
                                || T <- mnesia:system_info(tables)], Node==N].
 
-change_storage(Table,Type) -> mnesia:change_table_copy_type(Table, node(), Type).
+%change_storage(Table,Type) -> mnesia:change_table_copy_type(Table, node(), Type).
 
 initialize() ->
     mnesia:create_schema([node()]),
@@ -53,14 +54,12 @@ exec(Q) -> F = fun() -> qlc:e(Q) end, {atomic, Val} = mnesia:activity(context(),
 just_one(Fun) ->
     case mnesia:activity(context(),Fun) of
         {atomic, []} -> {error, not_found};
-        {atomic, [R]} -> {ok, R};
-        {atomic, [_|_]} -> {error, duplicated};
+        {atomic, R} -> {ok, R};
         [] -> {error, not_found};
-        [R] -> {ok,R};
-        [_|_] -> {error, duplicated};
+        R when is_list(R) -> {ok,R};
         Error -> Error end.
 
-add(Record) -> mnesia:activity(context(),fun() -> kvx:append(Record,#kvx{mod=?MODULE}) end).
+%add(Record) -> mnesia:activity(context(),fun() -> kvx:append(Record,#kvx{mod=?MODULE}) end).
 context() -> application:get_env(kvx,mnesia_context,async_dirty).
 
 sync_indexes() ->

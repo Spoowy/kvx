@@ -11,24 +11,24 @@ ref() -> kvx_rocks:ref().
 
 se(X,Y,Z)  -> setelement(X,Y,Z).
 e(X,Y)  -> element(X,Y).
-c0(R,V) -> se(1, R, V).
-c1(R,V) -> se(#reader.id,    R, V).
-c2(R,V) -> se(#reader.pos,   R, V).
+%c0(R,V) -> se(1, R, V).
+%c1(R,V) -> se(#reader.id,    R, V).
+%c2(R,V) -> se(#reader.pos,   R, V).
 c3(R,V) -> se(#reader.cache, R, V).
 c4(R,V) -> se(#reader.args,  R, V).
-c5(R,V) -> se(#reader.feed,  R, V).
-c6(R,V) -> se(#reader.dir,   R, V).
-wf(R,V) -> se(#writer.first, R, V).
+%c5(R,V) -> se(#reader.feed,  R, V).
+%c6(R,V) -> se(#reader.dir,   R, V).
+%wf(R,V) -> se(#writer.first, R, V).
 si(M,T) -> se(#it.id, M, T).
-el(X,T) -> e(X, T).
-tab(T)  -> e(1, T).
+%el(X,T) -> e(X, T).
+%tab(T)  -> e(1, T).
 id(T)   -> e(#it.id, T).
-pos(T)  -> e(#reader.pos, T).
-args(T) -> e(#writer.args, T).
-dir(0)  -> top;
-dir(1)  -> bot.
-acc(0)  -> next;
-acc(1)  -> prev.
+%pos(T)  -> e(#reader.pos, T).
+%args(T) -> e(#writer.args, T).
+%dir(0)  -> top;
+%dir(1)  -> bot.
+%acc(0)  -> next;
+%acc(1)  -> prev.
 
 % section: next, prev
 
@@ -76,15 +76,14 @@ take(#reader{args=N,feed=Feed,cache=I,dir=Dir}=C) ->
    Key   = list_to_binary(lists:concat(["/",io_lib:format("~p",[Feed])])),
    First = rocksdb:iterator_move(I, {seek,Key}),
    Res   = kvx_rocks:next(I,Key,size(Key),First,[],[],N,0),
-   C#reader{args= case Dir of 0 -> Res; 1 -> lists:reverse(Res); _ -> [] end}.
+   C#reader{args= case Dir of 0 -> Res; 1 -> lists:reverse(Res) end}.
 
 % new, save, load, up, down, top, bot
 
-load_writer (Id) -> case kvx:get(writer,Id) of {ok,C} -> C; E -> E end.
 load_reader (Id) ->
     case kvx:get(reader,Id) of
          {ok,#reader{}=C} -> C#reader{cache=element(2,rocksdb:iterator(ref(),[]))};
-              E -> E end.
+              _ -> #reader{id=[]} end.
 
 writer (Id) -> case kvx:get(writer,Id) of {ok,W} -> W; {error,_} -> #writer{id=Id} end.
 reader (Id) ->
@@ -92,7 +91,7 @@ reader (Id) ->
          {ok,#writer{}} ->
              {ok,I} = rocksdb:iterator(ref(), []),
              #reader{id=kvx:seq([],[]),feed=Id,cache=I};
-         {error,X} -> #reader{} end.
+         {error,_} -> #reader{} end.
 save (C) -> NC = c4(C,[]), N2 = c3(NC,[]), kvx:put(N2), N2.
 
 
@@ -131,4 +130,4 @@ cut(Feed,Id) ->
     {ok,I} = rocksdb:iterator(ref(), []),
     case rocksdb:iterator_move(I, {seek,A}) of
          {ok,A,X} -> {ok,prev(I,Key,size(Key),A,X,[],-1,0)};
-                _ -> {error,"unknown"} end.
+                _ -> {error,not_found} end.

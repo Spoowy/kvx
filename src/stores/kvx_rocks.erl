@@ -14,8 +14,8 @@ dir()      -> [].
 leave() -> case ref() of [] -> skip; X -> rocksdb:close(X) end.
 join(_) -> application:start(rocksdb),
            leave(), {ok, Ref} = rocksdb:open(application:get_env(kvx,rocks_name,"rocksdb"), [{create_if_missing, true}]),
+           initialize(),
            application:set_env(kvx,rocks_ref,Ref).
-change_storage(_,_) -> ok.
 initialize() -> [ kvx:initialize(kvx_rocks,Module) || Module <- kvx:modules() ].
 ref() -> application:get_env(kvx,rocks_ref,[]).
 index(_,_,_) -> [].

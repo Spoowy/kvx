@@ -1,6 +1,6 @@
 {application, kvx,
    [{description, "KVX Abstract Chain Database"},
-    {vsn, "6.4"},
+    {vsn, "6.5"},
     {registered, []},
     {applications, [kernel,stdlib]},
     {mod, { kvx, []}},

@@ -21,28 +21,15 @@ tables() -> [ #table  { name = writer, fields = record_info(fields, writer) },
 % section: kvx_stream prelude
 
 se(X,Y,Z)  -> setelement(X,Y,Z).
-set(X,Y,Z) -> setelement(X,Z,Y).
 e(X,Y)  -> element(X,Y).
-c0(R,V) -> se(1, R, V).
-c1(R,V) -> se(#reader.id,    R, V).
-c2(R,V) -> se(#reader.pos,   R, V).
-c3(R,V) -> se(#reader.cache, R, V).
 c4(R,V) -> se(#reader.args,  R, V).
-c5(R,V) -> se(#reader.feed,  R, V).
-c6(R,V) -> se(#reader.dir,   R, V).
-wf(R,V) -> se(#writer.first, R, V).
 sn(M,T) -> se(#iter.next, M, T).
 sp(M,T) -> se(#iter.prev, M, T).
 si(M,T) -> se(#iter.id, M, T).
-el(X,T) -> e(X, T).
 tab(T)  -> e(1, T).
 id(T)   -> e(#iter.id, T).
 en(T)   -> e(#iter.next, T).
 ep(T)   -> e(#iter.prev, T).
-pos(T)  -> e(#reader.pos, T).
-args(T) -> e(#writer.args, T).
-dir(0)  -> top;
-dir(1)  -> bot.
 acc(0)  -> next;
 acc(1)  -> prev.
 
@@ -87,8 +74,7 @@ drop(A,N,#reader{cache=B,pos=P}=C,C2,_,_) ->
 
 % new, save, load, up, down, top, bot
 
-load_writer (Id) -> case kvx:get(writer,Id) of {ok,C} -> C; E -> E end.
-load_reader (Id) -> case kvx:get(reader,Id) of {ok,C} -> C; E -> E end.
+load_reader (Id) -> case kvx:get(reader,Id) of {ok,C} -> C; _ -> #reader{id=[]} end.
 writer (Id) -> case kvx:get(writer,Id) of {ok,W} -> W; _ -> #writer{id=Id} end.
 reader (Id) -> case kvx:get(writer,Id) of
          {ok,#writer{first=[]}} -> #reader{id=kvx:seq(reader,1),feed=Id,cache=[]};
@@ -122,5 +108,7 @@ append(Rec,Feed) ->
         {ok,_}    -> Id;
         {error,_} -> kvx:save(kvx:add((kvx:writer(Feed))#writer{args=Rec})), Id end.
 
-cut(Feed,Id) ->
-   kvx:delete(Feed,Id).
+cut(_Feed,Id) ->
+   case kvx:get(writer,Id) of
+        {ok,#writer{count=N}} -> {ok,N};
+        {error,_} -> {error,not_found} end.
