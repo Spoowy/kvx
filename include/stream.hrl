@@ -15,6 +15,6 @@
 -spec reader (term()) -> #reader{}.
 -spec save (#reader{} | #writer{}) -> #reader{} | #writer{}.
 -spec add(#writer{}) -> #writer{}.
--spec append(tuple(),atom()) -> any().
+-spec append(tuple(),term()) -> any().
 -spec cut(term(),term()) -> {ok,non_neg_integer()} | {error, not_found}.
 -endif.
