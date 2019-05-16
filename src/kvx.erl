@@ -20,7 +20,7 @@ stop(_) -> ok.
 
 % kvx api
 
-dba()              -> application:get_env(kvx,dba,store_mnesia).
+dba()              -> application:get_env(kvx,dba,kvx_mnesia).
 kvx_stream()       -> application:get_env(kvx,dba_st,kvx_stream).
 all(Table)         -> all     (Table, #kvx{mod=dba()}).
 delete(Table,Key)  -> delete  (Table, Key, #kvx{mod=dba()}).
